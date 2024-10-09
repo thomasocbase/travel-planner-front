@@ -13,6 +13,17 @@ const theme = createTheme({
                 hover: '#E5E51A',
             }
         },
+        activities: {
+            accommodation: '#0470B4',
+            hiking: '#F2C304',
+            tour: '#222222',
+            shopping: '#D9D9D9',
+            meal: '#E5E51A',
+            sports: '#222222',
+            culture: '#707070',
+            relaxation: '#D9D9D9',
+            other: "grey"
+        },
     },
     typography: {
         h1: {
@@ -28,12 +39,12 @@ const theme = createTheme({
         },
         h3: {
             fontFamily: 'Poppins, Montserrat, sans-serif',
-            fontSize: '1.8rem',
+            fontSize: '1.6rem',
             fontWeight: 700,
         },
         h4: {
             fontFamily: 'Poppins, Montserrat, sans-serif',
-            fontSize: '1.5rem',
+            fontSize: '1.4rem',
             fontWeight: 600,
         },
         h5: {
@@ -46,7 +57,7 @@ const theme = createTheme({
         MuiTypography: {
             styleOverrides: {
                 root: {
-                    color: '#222222',
+                    color: '#000',
                 },
             },
             variants: [
@@ -57,6 +68,16 @@ const theme = createTheme({
                     style: {
                         fontFamily: 'Open Sans, sans-serif',
                         fontSize: '1rem',
+                        fontWeight: 400,
+                    }
+                },
+                {
+                    props: {
+                        variant: 'smaller'
+                    },
+                    style: {
+                        fontFamily: 'Open Sans, sans-serif',
+                        fontSize: '0.9rem',
                         fontWeight: 400,
                     }
                 },
@@ -148,6 +169,21 @@ const theme = createTheme({
                     },
                 },
             },
+            variants: [
+                {
+                    props: {
+                        variant: 'subnav'
+                    },
+                    style: {
+                        fontFamily: 'Poppins, Montserrat, sans-serif',
+                        fontSize: '1.2rem',
+                        textDecoration: 'none',
+                        '&:hover': {
+                            color: '#E5E51A',
+                        },
+                    }
+                },
+            ]
         },
     }
 });

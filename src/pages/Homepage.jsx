@@ -78,10 +78,10 @@ function Homepage() {
     return (
         <>
             {/* HERO HEADER */}
-            <Container component="section" maxWidth='lg' sx={{ my: 2, px: 2 }}>
+            <Container component="section" maxWidth='lg' sx={{ mb: 2, px: 2 }}>
                 <Box
                     sx={{
-                        backgroundImage: `linear-gradient(to top, rgba(34,34,34,0.5) 0%,rgba(34,34,34,1) 100%), url('${HeaderImage}')`,
+                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,1) 100%), url('${HeaderImage}')`,
                         backgroundSize: 'cover',
                         backgroundRepeat: 'no-repeat',
                         backgroundAttachment: 'fixed',

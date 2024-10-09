@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, IconButton, Link, Radio, RadioGroup, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import StarsIcon from '@mui/icons-material/Stars';
 import ClassIcon from '@mui/icons-material/Class';
 import PlanInternalNav from '../components/PlanInternalNav';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PublicIcon from '@mui/icons-material/Public';
-import ScrollSpy from "react-ui-scrollspy";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
+import ScrollSpy from 'react-ui-scrollspy';
+import PlanCard from '../components/PlanCard';
+
+const placeholderCardData = {
+    title: "Airbnb Trocadéro",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+    image: "https://picsum.photos/800/600",
+    url: "https://www.airbnb.com/rooms/12345678",
+    price: 100,
+    timeAllocation: 2,
+    category: "Accommodation",
+    location: "48.858285658772594, 2.3532079879966044",
+};
 
 function TravelPlan() {
     const theme = useTheme();
@@ -70,17 +83,18 @@ function TravelPlan() {
             status: editingValue
         });
         // TODO: Send new status to backend
-
     }
 
     console.log("travelPlan", plan);
     console.log("EditingValue", editingValue);
 
+    const color = "red"
+
     return (
         <Box component="main">
 
             {/* INFOS SECTION */}
-            <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }}>
+            <Container component="section" maxWidth="lg" sx={{ mb: 6, px: 2 }}>
 
                 <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
                     <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={2}>
@@ -120,7 +134,7 @@ function TravelPlan() {
                             </Box>
                         </Box>
                         <Typography variant="normal">{plan.info.description}</Typography>
-                        <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '15px' }}>
+                        <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}>
                             <Typography variant="h3" color="white">Quick Stats</Typography>
                             <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
                                 <Box display="flex" alignItems="baseline" gap={0.5}>
@@ -148,7 +162,7 @@ function TravelPlan() {
                         <Box
                             p={3}
                             display="flex" gap={3} flexWrap={"wrap"}
-                            sx={{ backgroundColor: theme.palette.primary.medium, borderRadius: '15px' }}
+                            sx={{ backgroundColor: theme.palette.primary.medium, borderRadius: '10px' }}
                         >
                             <Box display="flex" alignItems="center" gap={1} color="white">
                                 <StarsIcon />
@@ -166,7 +180,7 @@ function TravelPlan() {
                     </Grid>
 
                     <Grid item size={{ xs: 12, md: 6 }}>
-                        <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "15px" }}>
+                        <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "10px" }}>
                             <Box component="img" src={plan.info.image} alt="Travel Plan" width="100%" />
                         </Box>
                     </Grid>
@@ -180,23 +194,41 @@ function TravelPlan() {
 
             <ScrollSpy>
 
-            {/* BUCKET LIST */}
-            <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }}>
-                <Typography variant="h2">Bucket list</Typography>
-                <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '15px' }} />
-            </Container>
+                {/* BUCKET LIST */}
+                <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='bucketlist'>
+                    <Box
+                        p={3}
+                        sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
+                    >
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                            <Typography variant="h2">Bucket List</Typography>
+                            <Tooltip title="Add new activity" arrow>
+                                <IconButton>
+                                    <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                        <Grid container spacing={2}>
+                            <Grid item size={{ xs: 12, md: 6 }}>
+                                <PlanCard data={placeholderCardData} />
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Container>
 
-            {/* BUCKET LIST */}
-            <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }}>
-                <Typography variant="h2">Bucket list</Typography>
-                <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '15px' }} />
-            </Container>
+                {/* BUCKET LIST */}
+                <Container component="section" maxWidth="lg" sx={{ mt: 50, mb: 2, px: 2 }} id='plan'>
+                    <Typography variant="h2">Plan</Typography>
+                    <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }} />
 
-            {/* BUCKET LIST */}
-            <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }}>
-                <Typography variant="h2">Bucket list</Typography>
-                <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '15px' }} />
-            </Container>
+                </Container>
+
+                {/* BUCKET LIST */}
+                <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='archives'>
+                    <Typography variant="h2">Archives</Typography>
+                    <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '15px' }} />
+                </Container>
+
             </ScrollSpy>
 
 

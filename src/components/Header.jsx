@@ -66,7 +66,7 @@ function Header() {
             </Container>
 
             {/* LOGGED IN NAVBAR */}
-            <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white' }}>
+            <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white', mb: 3 }}>
                 <Container maxWidth="lg">
                     <Toolbar disableGutters sx={{ position: 'relative' }}>
 
@@ -138,7 +138,7 @@ function Header() {
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', ml: 4 }}>
                             {pages.map((page, index) => (
                                 <Link key={index} href={page.link} sx={{ color: 'inherit', textDecoration: 'none' }}>
-                                    <Button sx={{ color: 'inherit' }}>{page.name}</Button>
+                                    <Button sx={{ color: 'inherit', fontSize: "1.2rem" }}>{page.name}</Button>
                                 </Link>
                             ))}
                         </Box>
@@ -147,7 +147,7 @@ function Header() {
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                    <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/2.jpg" />
                                 </IconButton>
                             </Tooltip>
                             <Menu
