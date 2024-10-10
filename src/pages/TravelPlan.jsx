@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Grid from '@mui/material/Grid2';
-import { Box, Button, Card, CardActions, CardContent, CardMedia, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, IconButton, Link, Radio, RadioGroup, TextField, Tooltip, Typography, useTheme } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DoneIcon from '@mui/icons-material/Done';
-import CloseIcon from '@mui/icons-material/Close';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import LockPersonIcon from '@mui/icons-material/LockPerson';
-import StarsIcon from '@mui/icons-material/Stars';
-import ClassIcon from '@mui/icons-material/Class';
-import PlanInternalNav from '../components/PlanInternalNav';
-import ConfirmDialog from '../components/ConfirmDialog';
-import PublicIcon from '@mui/icons-material/Public';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Container, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import PlanInternalNav from '../components/plan/PlanInternalNav';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-
 import ScrollSpy from 'react-ui-scrollspy';
-import PlanCard from '../components/PlanCard';
+import PlanCard from '../components/plan/ActivityCard';
+import PlanOverview from '../components/plan/PlanOverview';
+import { DndContext } from "@dnd-kit/core";
+import DayCard from '../components/plan/DayCard';
+import UnfoldLessDoubleIcon from '@mui/icons-material/UnfoldLessDouble';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 
 const placeholderCardData = {
     title: "Airbnb Trocadéro",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
-    image: "https://picsum.photos/800/600",
+    image: "https://picsum.photos/id/42/800/600",
     url: "https://www.airbnb.com/rooms/12345678",
     price: 100,
     timeAllocation: 2,
@@ -27,12 +22,21 @@ const placeholderCardData = {
     location: "48.858285658772594, 2.3532079879966044",
 };
 
+const placeholderDays = [
+    {
+        title: "This is the title of the day",
+        order: 1,
+    },
+    {
+        title: "And here is another",
+        order: 2,
+    },
+]
+
 function TravelPlan() {
     const theme = useTheme();
 
     const [editingValue, setEditingValue] = useState();
-    const [isEditingTitle, setIsEditingTitle] = useState(false);
-    const [isOpenStatusDialog, setIsOpenStatusDialog] = useState(false);
 
     const [plan, setPlan] = useState({
         info: {
@@ -54,208 +58,118 @@ function TravelPlan() {
         }
     });
 
-    function handleEditTitleStart() {
-        setIsEditingTitle(true);
-        setEditingValue(plan.info.title);
+    const [isDropped, setIsDropped] = useState(false);
+
+    function handleDragEnd(event) {
+        if (event.over && event.over.id === 'droppable') {
+            setIsDropped(true);
+        }
     }
 
-    function handleEditTitleSubmit() {
-        setIsEditingTitle(false);
-        setPlan({
-            ...plan,
-            info: {
-                ...plan.info,
-                title: editingValue
-            }
-        });
-        // TODO: Send new title to backend
+    function updatePlan(data) {
+        setPlan(data);
     }
-
-    function handleEditStatusStart() {
-        setIsOpenStatusDialog(true);
-        setEditingValue(plan.status);
-    }
-
-    function handleStatusDialogConfirm() {
-        setIsOpenStatusDialog(false);
-        setPlan({
-            ...plan,
-            status: editingValue
-        });
-        // TODO: Send new status to backend
-    }
-
-    console.log("travelPlan", plan);
-    console.log("EditingValue", editingValue);
-
-    const color = "red"
 
     return (
         <Box component="main">
 
-            {/* INFOS SECTION */}
+            {/* OVERVIEW SECTION */}
             <Container component="section" maxWidth="lg" sx={{ mb: 6, px: 2 }}>
-
-                <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
-                    <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={2}>
-                        <Box display="flex" justifyContent="space-between" flexWrap={"wrap"}>
-                            <Box display="flex" gap={1}>
-                                {isEditingTitle ? (
-                                    <>
-                                        <TextField
-                                            variant='standard'
-                                            value={editingValue}
-                                            onChange={(e) => setEditingValue(e.target.value)}
-                                            sx={{ minWidth: "300px" }}
-                                        />
-                                        <IconButton onClick={handleEditTitleSubmit}>
-                                            <DoneIcon sx={{ color: theme.palette.primary.secondary }} />
-                                        </IconButton>
-                                        <IconButton onClick={() => setIsEditingTitle(false)} >
-                                            <CloseIcon />
-                                        </IconButton>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Typography variant="h2">{plan.info.title}</Typography>
-                                        <IconButton onClick={handleEditTitleStart}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </>
-                                )}
-                            </Box>
-                            <Box display="flex" alignItems="center" gap={0.5}>
-                                <Typography color='grey'>{plan.status}</Typography>
-                                <IconButton onClick={handleEditStatusStart}>
-                                    {plan.status === "Private" && <VisibilityOffIcon />}
-                                    {plan.status === "Restricted" && <LockPersonIcon />}
-                                    {plan.status === "Public" && <PublicIcon />}
-                                </IconButton>
-                            </Box>
-                        </Box>
-                        <Typography variant="normal">{plan.info.description}</Typography>
-                        <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}>
-                            <Typography variant="h3" color="white">Quick Stats</Typography>
-                            <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
-                                <Box display="flex" alignItems="baseline" gap={0.5}>
-                                    <Typography fontSize="2rem" color='white'>{plan.calculatedStats.totalDays}</Typography>
-                                    <Typography fontSize="1.2rem" color='white'>{plan.calculatedStats > 1 ? "days" : "day"}</Typography>
-                                </Box>
-                                <Box display="flex" alignItems="baseline" gap={0.5}>
-                                    <Typography fontSize="2rem" color='white'>{plan.calculatedStats.totalActivities}</Typography>
-                                    <Typography fontSize="1.2rem" color='white'>{plan.calculatedStats.totalActivities > 1 ? "activities" : "activity"}</Typography>
-                                </Box>
-                                <Box display="flex" alignItems="baseline" gap={0.5}>
-                                    <Typography fontSize="2rem" color='white'>{plan.calculatedStats.totalBudget}</Typography>
-                                    <Typography fontSize="1.2rem" color='white'>budget</Typography>
-                                </Box>
-                                <Box display="flex" alignItems="baseline" gap={0.5}>
-                                    <Typography fontSize="2rem" color='white'>{plan.calculatedStats.totalDrivingDistance}</Typography>
-                                    <Typography fontSize="1.2rem" color='white'>driving</Typography>
-                                </Box>
-                                <Box display="flex" alignItems="baseline" gap={0.5}>
-                                    <Typography fontSize="2rem" color='white'>{plan.calculatedStats.totalHikingDistance}</Typography>
-                                    <Typography fontSize="1.2rem" color='white'>hiking</Typography>
-                                </Box>
-                            </Box>
-                        </Box>
-                        <Box
-                            p={3}
-                            display="flex" gap={3} flexWrap={"wrap"}
-                            sx={{ backgroundColor: theme.palette.primary.medium, borderRadius: '10px' }}
-                        >
-                            <Box display="flex" alignItems="center" gap={1} color="white">
-                                <StarsIcon />
-                                <Typography color='white'>
-                                    {plan.socialStats.likes} {plan.socialStats.likes > 1 ? "likes" : "like"}
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" gap={1} color="white">
-                                <ClassIcon />
-                                <Typography color='white'>
-                                    Saved by {plan.socialStats.saves} {plan.socialStats.saves > 1 ? "members" : "member"}
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Grid>
-
-                    <Grid item size={{ xs: 12, md: 6 }}>
-                        <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "10px" }}>
-                            <Box component="img" src={plan.info.image} alt="Travel Plan" width="100%" />
-                        </Box>
-                    </Grid>
-
-                </Grid>
-
+                <PlanOverview plan={plan} updatePlan={updatePlan} />
             </Container>
 
             {/* ANCHOR NAV */}
             <PlanInternalNav />
 
             <ScrollSpy>
+                <DndContext onDragEnd={handleDragEnd}>
 
-                {/* BUCKET LIST */}
-                <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='bucketlist'>
-                    <Box
-                        p={3}
-                        sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
-                    >
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                            <Typography variant="h2">Bucket List</Typography>
-                            <Tooltip title="Add new activity" arrow>
-                                <IconButton>
-                                    <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-                        <Grid container spacing={2}>
-                            <Grid item size={{ xs: 12, md: 6 }}>
-                                <PlanCard data={placeholderCardData} />
+                    {/* BUCKET LIST */}
+                    <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='bucketlist'>
+                        <Box
+                            p={3}
+                            sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
+                        >
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                <Typography variant="h2">Bucket List</Typography>
+                                <Tooltip title="Add new activity" placement='left' arrow>
+                                    <IconButton>
+                                        <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
+                            <Grid container spacing={2}>
+                                <Grid item size={{ xs: 12, md: 6 }}>
+                                    <PlanCard data={placeholderCardData} />
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </Container>
+                        </Box>
+                    </Container>
 
-                {/* BUCKET LIST */}
-                <Container component="section" maxWidth="lg" sx={{ mt: 50, mb: 2, px: 2 }} id='plan'>
-                    <Typography variant="h2">Plan</Typography>
-                    <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }} />
+                    {/* TRAVEL PLAN */}
+                    <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='plan'>
+                        <Box
+                            p={3}
+                            sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid item size={{ xs: 12, md: 7 }}>
+                                    <Box display="flex" flexDirection="column" gap={2}>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
 
-                </Container>
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                                <Typography variant="h2" color="white">
+                                                    Travel Plan
+                                                </Typography>
+                                            </Box>
 
-                {/* BUCKET LIST */}
-                <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='archives'>
-                    <Typography variant="h2">Archives</Typography>
-                    <Box height={500} sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '15px' }} />
-                </Container>
+                                            <Tooltip title="Collapse all" placement='left' arrow>
+                                                <IconButton sx={{ mr: 0.75 }}>
+                                                    <UnfoldLessDoubleIcon sx={{ color: "white", fontSize: "2rem" }} />
+                                                </IconButton>
+                                            </Tooltip>
 
+                                        </Box>
+
+                                        {placeholderDays.map((day, index) => (
+                                            <DayCard day={day} index={index}>
+                                                {placeholderDays.map((day, index) => (
+                                                    <PlanCard data={placeholderCardData} />
+                                                ))}
+                                            </DayCard>
+                                        ))}
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Container>
+
+                    {/* ARCHIVES */}
+                    <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='archives'>
+                        <Box
+                            p={3}
+                            sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
+                        >
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                    <Typography variant="h2" color="black">
+                                        Archives
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Grid container spacing={2}>
+                                <Grid item size={{ xs: 12, md: 6 }}>
+                                    <PlanCard data={placeholderCardData} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Container>
+
+                </DndContext>
             </ScrollSpy>
-
-
-            {/* STATUS DIALOG */}
-            <ConfirmDialog
-                open={isOpenStatusDialog}
-                onClose={() => setIsOpenStatusDialog(false)}
-                title="Change status"
-                confirm={handleStatusDialogConfirm}
-                cancel={() => setIsOpenStatusDialog(false)}
-            >
-                <FormControl>
-                    <RadioGroup
-                        aria-labelledby="radio-buttons-status-label"
-                        defaultValue={editingValue}
-                        name="radio-buttons-status-group"
-                        onChange={(e) => setEditingValue(e.target.value)}
-                    >
-                        <FormControlLabel value="Private" control={<Radio />} label="Private" />
-                        <Typography variant="notice" sx={{ mb: 2 }} >Only you can see this plan</Typography>
-                        <FormControlLabel value="Restricted" control={<Radio />} label="Restricted" />
-                        <Typography variant="notice" sx={{ mb: 2 }}>Only your friends can see this plan</Typography>
-                        <FormControlLabel value="Public" control={<Radio />} label="Public" />
-                        <Typography variant="notice" sx={{ mb: 2 }}>Everyone can see this plan (pending moderation)</Typography>
-                    </RadioGroup>
-                </FormControl>
-            </ConfirmDialog>
 
         </Box>
     );

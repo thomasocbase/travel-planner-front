@@ -95,7 +95,7 @@ function Homepage() {
                     }}
                 >
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 5, px: 10 }}>
-                        <Typography variant='h2' textAlign="center" color="white">Our job? Simplify your travel planning</Typography>
+                        <Typography variant='h1' textAlign="center" color="white">Our job? Simplify your travel planning</Typography>
                         <Typography variant="normal" textAlign="center" color={theme.palette.primary.light} sx={{ display: { xs: 'none', sm: 'block' } }}>
                             Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.
                             Sit ipsum orci diam consectetur mattis habitasse odio id magna. Donec ut et semper et aliquam.

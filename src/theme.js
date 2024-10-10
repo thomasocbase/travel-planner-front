@@ -28,13 +28,13 @@ const theme = createTheme({
     typography: {
         h1: {
             fontFamily: 'Poppins, Montserrat, sans-serif',
-            fontSize: '3rem',
+            fontSize: '2.2rem',
             fontWeight: 700,
             textTransform: 'uppercase',
         },
         h2: {
             fontFamily: 'Poppins, Montserrat, sans-serif',
-            fontSize: '2.3rem',
+            fontSize: '2rem',
             fontWeight: 700,
         },
         h3: {
@@ -45,7 +45,7 @@ const theme = createTheme({
         h4: {
             fontFamily: 'Poppins, Montserrat, sans-serif',
             fontSize: '1.4rem',
-            fontWeight: 600,
+            fontWeight: 700,
         },
         h5: {
             fontFamily: 'Poppins, Montserrat, sans-serif',

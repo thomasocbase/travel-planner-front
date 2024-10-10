@@ -1,4 +1,4 @@
-import { Box, Card, CardActions, CardContent, CardMedia, IconButton, Link, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Link, Typography, useTheme } from "@mui/material";
 import React from "react";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -6,12 +6,41 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import LinkIcon from '@mui/icons-material/Link';
 import EditIcon from '@mui/icons-material/Edit';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-
-import matchCategoryColor from '../helpers/activityColor';
-
+import NordicWalkingIcon from '@mui/icons-material/NordicWalking';
+import HotelIcon from '@mui/icons-material/Hotel';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import TourIcon from '@mui/icons-material/Tour';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import ExploreIcon from '@mui/icons-material/Explore';
+import matchCategoryColor from '../../helpers/activityColor';
 
 export default function PlanCard(props) {
     const theme = useTheme();
+
+    function matchCategoryIcon(category) {
+        const fontSize = "1.2rem";
+        switch (category) {
+            case "Accommodation":
+                return <HotelIcon sx={{ fontSize: fontSize }} />;
+            case "Meal":
+                return <RestaurantIcon sx={{ fontSize: fontSize }} />;
+            case "Hike":
+                return <NordicWalkingIcon sx={{ fontSize: fontSize }} />;
+            case "Tour":
+                return <TourIcon />;
+            case "Note":
+                return <StickyNote2Icon sx={{ fontSize: fontSize }} />;
+            case "Shopping":
+                return <LocalMallIcon sx={{ fontSize: fontSize }} />;
+            case "Relaxation":
+                return <SelfImprovementIcon sx={{ fontSize: fontSize }} />;
+            default:
+                return <ExploreIcon sx={{ fontSize: fontSize }} />;
+        }
+    }
+
     return (
         <Card sx={{
             backgroundColor: "white",
@@ -22,12 +51,12 @@ export default function PlanCard(props) {
                 <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "33%", aspectRatio: 1, borderRadius: "5px" }} />
                 <Box display="flex" flexDirection="column" gap={1}>
                     <Box display="flex" alignItems="center" justifyContent="space-between">
-                        <Typography variant="h3">{props.data.title}</Typography>
-                        <DragIndicatorIcon sx={{ color: theme.palette.primary.light }}/>
+                        <Typography variant="h5">{props.data.title}</Typography>
+                        <DragIndicatorIcon sx={{ color: theme.palette.primary.light }} />
                     </Box>
-                    <Typography variant="normal" color={matchCategoryColor(props.data.category)}>
-                        {props.data.category}
-                    </Typography>
+                    <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
+                        sx={{ alignSelf: "start", fontSize: "0.75rem", px: 1, color: matchCategoryColor(props.data.category)}}
+                    />
                     <Typography variant="smaller">
                         {props.data.description}
                     </Typography>
