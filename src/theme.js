@@ -52,6 +52,11 @@ const theme = createTheme({
             fontSize: '1.2rem',
             fontWeight: 700,
         },
+        h6: {
+            fontFamily: 'Poppins, Montserrat, sans-serif',
+            fontSize: '1rem',
+            fontWeight: 700,
+        },
     },
     components: {
         MuiTypography: {

@@ -1,5 +1,5 @@
 import { Box, Container, IconButton, Link, Paper, Typography, useTheme } from '@mui/material';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 
 function PlanInternalNav() {
@@ -12,11 +12,24 @@ function PlanInternalNav() {
         { name: 'Archives', anchor: 'archives' }
     ];
 
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+        window.onscroll = function () {
+            if (window.scrollY === 0) {
+                setIsAtTop(true);
+            } else {
+                setIsAtTop(false);
+            }
+        };
+    }, []);
+
     return (
         <Container component="nav" maxWidth='lg'
             sx={{ position: 'sticky', zIndex: 9999, top: 0, my: 4, px: 2 }}
         >
             <Paper elevation={3} sx={{ backgroundColor: "white" }}>
+
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
                     <Box display={'flex'} gap={2}>
                         {navItems.map((item, index) => (
@@ -38,11 +51,15 @@ function PlanInternalNav() {
                             </Box>
                         ))}
                     </Box>
-                    <Box>
-                        <IconButton href="#top">
-                            <VerticalAlignTopIcon sx={{ color: theme.palette.primary.dark, fontSize: "1.5rem" }} />
-                        </IconButton>
-                    </Box>
+
+                    {/* BACK TO TOP BUTTON */}
+                    {isAtTop ? null :
+                        <Box>
+                            <IconButton href="#top">
+                                <VerticalAlignTopIcon sx={{ color: theme.palette.primary.dark, fontSize: "1.5rem" }} />
+                            </IconButton>
+                        </Box>
+                    }
                 </Box>
             </Paper>
         </Container >

@@ -26,10 +26,14 @@ const placeholderDays = [
     {
         title: "This is the title of the day",
         order: 1,
+        duration: "8h",
+        budget: "50",
     },
     {
         title: "And here is another",
         order: 2,
+        duration: "6h",
+        budget: "30",
     },
 ]
 
@@ -91,7 +95,12 @@ function TravelPlan() {
                             sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
                         >
                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Typography variant="h2">Bucket List</Typography>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                    <Typography variant="h2" color="black">
+                                        Bucket list
+                                    </Typography>
+                                </Box>
                                 <Tooltip title="Add new activity" placement='left' arrow>
                                     <IconButton>
                                         <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
@@ -107,7 +116,7 @@ function TravelPlan() {
                     </Container>
 
                     {/* TRAVEL PLAN */}
-                    <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='plan'>
+                    <Container component="section" maxWidth="lg" sx={{ my: 3, px: 2 }} id='plan'>
                         <Box
                             p={3}
                             sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}
