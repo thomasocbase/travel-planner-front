@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Grid from '@mui/material/Grid2';
 import { Alert, Box, Button, FormControl, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Typography, useTheme } from '@mui/material';
 import ConfirmDialog from '../ConfirmDialog';
@@ -12,6 +12,7 @@ import ClassIcon from '@mui/icons-material/Class';
 import PublicIcon from '@mui/icons-material/Public';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { MuiFileInput } from 'mui-file-input'
+import StatusContext from '../status/StatusContext';
 
 
 export default function PlanOverview(props) {
@@ -23,6 +24,8 @@ export default function PlanOverview(props) {
     const [error, setError] = useState(null);
     const [file, setFile] = useState(null);
     const [fileError, setFileError] = useState(null);
+
+    const { appStatus, setAppStatus } = useContext(StatusContext);
 
     function handleEditTitleStart() {
         setIsEditingTitle(true);
@@ -82,7 +85,8 @@ export default function PlanOverview(props) {
         }
 
         // TODO: Upload file to backend
-        console.log("Uploading file", file);
+        console.log("File uploaded", file);
+        setAppStatus({ open: true, severity: "info", message: "Image uploaded" });
         
         setFileError(null);
         setFile(null);
