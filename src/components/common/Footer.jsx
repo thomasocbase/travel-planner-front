@@ -52,7 +52,7 @@ function Footer() {
     ];
 
     return (
-        <Container component="footer" maxWidth="false" sx={{ backgroundColor: "black", minHeight: "100px", pt: 5, pb: 2 }}>
+        <Container component="footer" maxWidth="false" sx={{ backgroundColor: "black", minHeight: "100px", pt: 5, pb: 2, mt: 4 }}>
             <Container>
                 <Grid container columnSpacing={10} rowSpacing={5} justifyContent="space-between">
                     <Grid item>

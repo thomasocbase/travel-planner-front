@@ -12,7 +12,7 @@ export default function DayCard(props) {
             key={props.index}
             defaultExpanded
             disableGutters
-            sx={{ backgroundColor: theme.palette.primary.light, borderRadius: "10px", boxShadow: "0 0 10px 0 rgba(0,0,0,0.1)" }}
+            sx={{ backgroundColor: "transparent", borderRadius: "10px", boxShadow: "0 0 10px 0 rgba(0,0,0,0.1)" }}
         >
             <AccordionSummary id={`panel${props.index}-header`}
                 expandIcon={<ExpandMoreIcon sx={{ color: "black", fontSize: "2rem" }} />}
@@ -22,7 +22,7 @@ export default function DayCard(props) {
                 <Typography variant="h4">Day {props.day.order} - {props.day.title}</Typography>
             </AccordionSummary>
 
-            <AccordionDetails sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+            <AccordionDetails sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 2, backgroundColor: theme.palette.primary.light, borderRadius: "0 0 10px 10px" }}>
                 {props.children}
                 
                 <Box sx={{ display: "flex", gap: 2, alignItems: "center", margin: "0 auto" }}>

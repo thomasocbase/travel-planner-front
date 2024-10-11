@@ -11,6 +11,8 @@ import DayCard from '../components/plan/DayCard';
 import UnfoldLessDoubleIcon from '@mui/icons-material/UnfoldLessDouble';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { placeholderCardData } from '../components/data/placeholderCards';
+import AddDayButton from '../components/plan/AddDayButton';
+import { Add } from '@mui/icons-material';
 
 const standalonePlaceholderCardData = {
     title: "Airbnb Trocadéro",
@@ -73,6 +75,15 @@ function TravelPlan() {
 
     function updatePlan(data) {
         setPlan(data);
+    }
+
+    function updateDays(data) {
+        placeholderDays.push({
+            title: data,
+            order: placeholderDays.length + 1,
+            duration: "8h",
+            budget: "50",
+        });
     }
 
     return (
@@ -143,13 +154,18 @@ function TravelPlan() {
                                         </Box>
 
                                         {placeholderDays.map((day, index) => (
-                                            <DayCard day={day} index={index}>
-                                                {placeholderCardData.map((card, index) => (
-                                                    <ActivityCard data={card} />
-                                                ))}
-                                            </DayCard>
+                                            <Box key={index}>
+                                                <DayCard day={day} index={index}>
+                                                    {placeholderCardData.map((card, index) => (
+                                                        <ActivityCard data={card} />
+                                                    ))}
+                                                </DayCard>
+                                            </Box>
                                         ))}
                                     </Box>
+                                </Grid>
+                                <Grid item size={{ xs: 12, md: 7 }}>
+                                    <AddDayButton updateDays={updateDays} />
                                 </Grid>
                             </Grid>
                         </Box>

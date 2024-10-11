@@ -86,7 +86,7 @@ export default function PlanOverview(props) {
 
         // TODO: Upload file to backend
         console.log("File uploaded", file);
-        setAppStatus({ open: true, severity: "info", message: "Image uploaded" });
+        setAppStatus({ open: true, severity: "success", message: "Image uploaded" });
         
         setFileError(null);
         setFile(null);
@@ -209,12 +209,12 @@ export default function PlanOverview(props) {
                             placeholder="Upload an image"
                             value={file}
                             onChange={handleFileChange}
-                            inputProps={{ accept: '.png, .jpeg' }}
+                            inputProps={{ accept: '.png, .jpeg', startAdornment: <FileUploadIcon /> }}
                             clearIconButtonProps={{
                                 title: "Remove",
                                 children: <CloseIcon fontSize="small" />
                             }}
-                            sx={{ width: { xs: "80%", sm: "50%" } }}
+                            sx={{ width: { xs: "80%", sm: "50%" }, backgroundColor: "white" }}
                         />
                         {fileError && <Alert severity="warning">{fileError}</Alert>}
                         {file &&

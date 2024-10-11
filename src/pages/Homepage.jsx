@@ -169,7 +169,7 @@ function Homepage() {
             </Container >
             
             {/* SOCIALS */}
-            < Container component="section" maxWidth='lg' sx={{ my: 6, px: 2 }}>
+            < Container component="section" maxWidth='lg' sx={{ my: 2, px: 2 }}>
                 <Box display="flex" flexDirection="column" alignItems="center" p={5}>
                     <Typography variant='h2' textAlign="center">Follow us on social media</Typography>
                     <Box display="flex" justifyContent="center" mt={2} >

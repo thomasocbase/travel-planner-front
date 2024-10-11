@@ -33,7 +33,7 @@ function PlanInternalNav() {
         <Container component="nav" maxWidth='lg'
             sx={{ position: 'sticky', zIndex: 9999, top: 0, my: 4, px: 2 }}
         >
-            <Paper elevation={3} sx={{ backgroundColor: "white" }}>
+            <Paper elevation={3} sx={{ backgroundColor: "white", borderRadius: "0 0 10px 10px" }}>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
                     <Box display={'flex'} gap={2}>

@@ -52,7 +52,7 @@ export default function PlanCard(props) {
             }}>
                 <CardContent sx={{ display: "flex", gap: 2, flexDirection: isSmallScreen ? "column-reverse" : "row" }}>
                     {isSmallScreen ? (
-                        <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "100%", aspectRatio: 4/3, borderRadius: "5px" }} />
+                        <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "100%", aspectRatio: 4 / 3, borderRadius: "5px" }} />
                     ) : (
                         <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "33%", aspectRatio: 1, borderRadius: "5px" }} />
                     )
@@ -63,8 +63,12 @@ export default function PlanCard(props) {
                             <DragIndicatorIcon sx={{ color: theme.palette.primary.light }} />
                         </Box>
                         <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
-                            sx={{ alignSelf: "start", fontSize: "0.75rem", px: 1, color: matchCategoryColor(props.data.category) }}
-                        />
+                            sx={{
+                                alignSelf: "start",
+                                fontFamily: "Poppins, sans-serif", fontSize: "0.75rem", fontWeight: 600,
+                                px: 1,
+                                color: matchCategoryColor(props.data.category)
+                            }} />
                         <Typography variant="smaller">
                             {props.data.description}
                         </Typography>
