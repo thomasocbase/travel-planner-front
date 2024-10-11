@@ -7,7 +7,7 @@ const theme = createTheme({
             secondary: '#E5E51A',
             dark: '#222222',
             medium: "#707070",
-            light: '#D9D9D9',
+            light: '#E9E9E9',
             action: {
                 active: '#F2C304',
                 hover: '#E5E51A',
@@ -15,10 +15,10 @@ const theme = createTheme({
         },
         activities: {
             accommodation: '#0470B4',
-            hiking: '#F2C304',
-            tour: '#222222',
-            shopping: '#D9D9D9',
-            meal: '#E5E51A',
+            hike: '#00bd1c',
+            tour: '#ff3636',
+            shopping: '#f757ff',
+            meal: '#ff872b',
             sports: '#222222',
             culture: '#707070',
             relaxation: '#D9D9D9',

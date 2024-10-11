@@ -1,18 +1,23 @@
 import { Box, Container, IconButton, Link, Paper, Typography, useTheme } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
+import { useMediaQuery } from '@mui/material';
+import ListIcon from '@mui/icons-material/List';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import InboxIcon from '@mui/icons-material/Inbox';
 
 function PlanInternalNav() {
     const theme = useTheme();
 
     const navItems = [
         // { name: 'Overview', anchor: 'overview' },
-        { name: 'Bucket List', anchor: 'bucketlist' },
-        { name: 'Plan', anchor: 'plan' },
-        { name: 'Archives', anchor: 'archives' }
+        { name: 'Bucket List', anchor: 'bucketlist', icon: <ListIcon /> },
+        { name: 'Plan', anchor: 'plan', icon: <CalendarMonthIcon /> },
+        { name: 'Archives', anchor: 'archives', icon: <InboxIcon /> },
     ];
 
     const [isAtTop, setIsAtTop] = useState(true);
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         window.onscroll = function () {
@@ -46,7 +51,8 @@ function PlanInternalNav() {
                                     key={index}
                                     href={`#${item.anchor}`}
                                 >
-                                    {item.name}
+                                    {isSmallScreen && item.icon}
+                                    {!isSmallScreen && item.name}
                                 </Link>
                             </Box>
                         ))}

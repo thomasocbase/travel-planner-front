@@ -15,9 +15,11 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import ExploreIcon from '@mui/icons-material/Explore';
 import matchCategoryColor from '../../helpers/activityColor';
+import { useMediaQuery } from '@mui/material';
 
 export default function PlanCard(props) {
     const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     function matchCategoryIcon(category) {
         const fontSize = "1.2rem";
@@ -42,50 +44,59 @@ export default function PlanCard(props) {
     }
 
     return (
-        <Card sx={{
-            backgroundColor: "white",
-            borderRadius: '10px',
-            borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
-        }}>
-            <CardContent sx={{ display: "flex", gap: 2 }}>
-                <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "33%", aspectRatio: 1, borderRadius: "5px" }} />
-                <Box display="flex" flexDirection="column" gap={1}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                        <Typography variant="h5">{props.data.title}</Typography>
-                        <DragIndicatorIcon sx={{ color: theme.palette.primary.light }} />
+        <>
+            <Card sx={{
+                backgroundColor: "white",
+                borderRadius: '10px',
+                borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
+            }}>
+                <CardContent sx={{ display: "flex", gap: 2, flexDirection: isSmallScreen ? "column-reverse" : "row" }}>
+                    {isSmallScreen ? (
+                        <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "100%", aspectRatio: 4/3, borderRadius: "5px" }} />
+                    ) : (
+                        <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "33%", aspectRatio: 1, borderRadius: "5px" }} />
+                    )
+                    }
+                    <Box display="flex" flexDirection="column" gap={1}>
+                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                            <Typography variant="h5">{props.data.title}</Typography>
+                            <DragIndicatorIcon sx={{ color: theme.palette.primary.light }} />
+                        </Box>
+                        <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
+                            sx={{ alignSelf: "start", fontSize: "0.75rem", px: 1, color: matchCategoryColor(props.data.category) }}
+                        />
+                        <Typography variant="smaller">
+                            {props.data.description}
+                        </Typography>
+                        <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
+                            <LinkIcon />
+                            <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>View</Link>
+                        </Box>
                     </Box>
-                    <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
-                        sx={{ alignSelf: "start", fontSize: "0.75rem", px: 1, color: matchCategoryColor(props.data.category)}}
-                    />
-                    <Typography variant="smaller">
-                        {props.data.description}
-                    </Typography>
-                    <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
-                        <LinkIcon />
-                        <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>View</Link>
+                </CardContent>
+                <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
+                    <Box display={"flex"} gap={2}>
+                        <Box display="flex" alignItems={"center"} gap={1}>
+                            <AccessTimeIcon />
+                            <Typography variant='smaller'>{props.data.timeAllocation}h</Typography>
+                        </Box>
+                        <Box display="flex" alignItems={"center"} gap={1}>
+                            <CreditCardIcon />
+                            <Typography variant='smaller'>{props.data.price}€</Typography>
+                        </Box>
                     </Box>
-                </Box>
-            </CardContent>
-            <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
-                <Box display={"flex"} gap={2}>
-                    <Box display="flex" alignItems={"center"} gap={1}>
-                        <AccessTimeIcon />
-                        <Typography variant='smaller'>{props.data.timeAllocation}h</Typography>
+                    <Box display="flex" sx={{ color: "black" }}>
+                        <IconButton color='inherit'>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton color='inherit'>
+                            <ArchiveIcon />
+                        </IconButton>
                     </Box>
-                    <Box display="flex" alignItems={"center"} gap={1}>
-                        <CreditCardIcon />
-                        <Typography variant='smaller'>{props.data.price}€</Typography>
-                    </Box>
-                </Box>
-                <Box display="flex" sx={{ color: "black" }}>
-                    <IconButton color='inherit'>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton color='inherit'>
-                        <ArchiveIcon />
-                    </IconButton>
-                </Box>
-            </CardActions>
-        </Card>
+                </CardActions>
+            </Card>
+
+            {/* EDIT DIALOG */}
+        </>
     )
 }

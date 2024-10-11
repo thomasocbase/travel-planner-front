@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
-import { Alert, Box, FormControl, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Typography, useTheme } from '@mui/material';
+import { Alert, Box, Button, FormControl, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Typography, useTheme } from '@mui/material';
 import ConfirmDialog from '../ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
@@ -10,6 +10,9 @@ import LockPersonIcon from '@mui/icons-material/LockPerson';
 import StarsIcon from '@mui/icons-material/Stars';
 import ClassIcon from '@mui/icons-material/Class';
 import PublicIcon from '@mui/icons-material/Public';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { MuiFileInput } from 'mui-file-input'
+
 
 export default function PlanOverview(props) {
     const theme = useTheme();
@@ -18,6 +21,8 @@ export default function PlanOverview(props) {
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [isOpenStatusDialog, setIsOpenStatusDialog] = useState(false);
     const [error, setError] = useState(null);
+    const [file, setFile] = useState(null);
+    const [fileError, setFileError] = useState(null);
 
     function handleEditTitleStart() {
         setIsEditingTitle(true);
@@ -66,11 +71,30 @@ export default function PlanOverview(props) {
         // TODO: Send new status to backend
     }
 
+    const handleFileChange = (newFile) => {
+        setFile(newFile)
+    }
+
+    const handleImageUpload = () => {
+        if (!file) {
+            setFileError("Please select a file to upload");
+            return;
+        }
+
+        // TODO: Upload file to backend
+        console.log("Uploading file", file);
+        
+        setFileError(null);
+        setFile(null);
+    }
+
     return (
         <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
             <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={2}>
                 <Box display="flex" justifyContent="space-between" flexWrap={"wrap"}>
                     <Box display="flex" gap={1}>
+
+                        {/* TITLE */}
                         {isEditingTitle ? (
                             <>
                                 <TextField
@@ -99,6 +123,8 @@ export default function PlanOverview(props) {
                             </>
                         )}
                     </Box>
+
+                    {/* STATUS */}
                     <Box display="flex" alignItems="center" gap={0.5}>
                         <Typography color='grey'>{props.plan.status}</Typography>
                         <IconButton onClick={handleEditStatusStart}>
@@ -108,11 +134,15 @@ export default function PlanOverview(props) {
                         </IconButton>
                     </Box>
                 </Box>
+
                 {error && <Alert severity="warning">{error}</Alert>}
+
                 <Typography variant="normal">{props.plan.info.description}</Typography>
+
+                {/* QUICK STATS */}
                 <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}>
                     <Typography variant="h3" color="white">Quick Stats</Typography>
-                    <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+                    <Box display="flex" flexWrap="wrap" gap={3} mt={2}>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
                             <Typography fontSize="2rem" color='white'>{props.plan.calculatedStats.totalDays}</Typography>
                             <Typography fontSize="1.2rem" color='white'>{props.plan.calculatedStats > 1 ? "days" : "day"}</Typography>
@@ -135,6 +165,8 @@ export default function PlanOverview(props) {
                         </Box>
                     </Box>
                 </Box>
+
+                {/* SOCIAL STATS */}
                 <Box
                     p={3}
                     display="flex" gap={3} flexWrap={"wrap"}
@@ -155,10 +187,39 @@ export default function PlanOverview(props) {
                 </Box>
             </Grid>
 
+            {/* FEATURED IMAGE */}
             <Grid item size={{ xs: 12, md: 6 }}>
-                <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "10px" }}>
-                    <Box component="img" src={props.plan.info.image} alt="Travel Plan" width="100%" />
-                </Box>
+                {props.plan.info.image ? (
+                    <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "10px" }}>
+                        <Box component="img" src={props.plan.info.image} alt="Travel Plan" width="100%" />
+                    </Box>
+                ) : (
+                    <Box sx={{
+                        width: "100%", aspectRatio: { xs: "4/2", md: "4/3" },
+                        backgroundColor: theme.palette.primary.light,
+                        background: "repeating-linear-gradient( -45deg, #fff, #fff 5px, #f7f7f7 5px, #f7f7f7 25px )",
+                        borderRadius: "10px",
+                        display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2
+                    }}>
+                        <MuiFileInput
+                            placeholder="Upload an image"
+                            value={file}
+                            onChange={handleFileChange}
+                            inputProps={{ accept: '.png, .jpeg' }}
+                            clearIconButtonProps={{
+                                title: "Remove",
+                                children: <CloseIcon fontSize="small" />
+                            }}
+                            sx={{ width: { xs: "80%", sm: "50%" } }}
+                        />
+                        {fileError && <Alert severity="warning">{fileError}</Alert>}
+                        {file &&
+                            <Button variant="blackOverGrey" startIcon={<FileUploadIcon />} onClick={handleImageUpload}>
+                                Upload
+                            </Button>
+                        }
+                    </Box>
+                )}
             </Grid>
 
             {/* STATUS DIALOG */}

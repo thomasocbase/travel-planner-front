@@ -4,14 +4,15 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Container, IconButt
 import PlanInternalNav from '../components/plan/PlanInternalNav';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ScrollSpy from 'react-ui-scrollspy';
-import PlanCard from '../components/plan/ActivityCard';
+import ActivityCard from '../components/plan/ActivityCard';
 import PlanOverview from '../components/plan/PlanOverview';
 import { DndContext } from "@dnd-kit/core";
 import DayCard from '../components/plan/DayCard';
 import UnfoldLessDoubleIcon from '@mui/icons-material/UnfoldLessDouble';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import { placeholderCardData } from '../components/data/placeholderCards';
 
-const placeholderCardData = {
+const standalonePlaceholderCardData = {
     title: "Airbnb Trocadéro",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
     image: "https://picsum.photos/id/42/800/600",
@@ -46,7 +47,7 @@ function TravelPlan() {
         info: {
             title: "My Travel Plan Title",
             description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
-            image: "https://picsum.photos/800/600",
+            // image: "https://picsum.photos/id/177/800/600",
         },
         status: "Private",
         calculatedStats: {
@@ -109,7 +110,7 @@ function TravelPlan() {
                             </Box>
                             <Grid container spacing={2}>
                                 <Grid item size={{ xs: 12, md: 6 }}>
-                                    <PlanCard data={placeholderCardData} />
+                                    <ActivityCard data={standalonePlaceholderCardData} />
                                 </Grid>
                             </Grid>
                         </Box>
@@ -143,8 +144,8 @@ function TravelPlan() {
 
                                         {placeholderDays.map((day, index) => (
                                             <DayCard day={day} index={index}>
-                                                {placeholderDays.map((day, index) => (
-                                                    <PlanCard data={placeholderCardData} />
+                                                {placeholderCardData.map((card, index) => (
+                                                    <ActivityCard data={card} />
                                                 ))}
                                             </DayCard>
                                         ))}
@@ -171,7 +172,7 @@ function TravelPlan() {
 
                             <Grid container spacing={2}>
                                 <Grid item size={{ xs: 12, md: 6 }}>
-                                    <PlanCard data={placeholderCardData} />
+                                    <ActivityCard data={standalonePlaceholderCardData} />
                                 </Grid>
                             </Grid>
                         </Box>
