@@ -19,9 +19,8 @@ const theme = createTheme({
             tour: '#ff3636',
             shopping: '#f757ff',
             meal: '#ff872b',
-            sports: '#222222',
-            culture: '#707070',
-            relaxation: '#D9D9D9',
+            note: '#222222',
+            transport: '#D9D9D9',
             other: "grey"
         },
     },
@@ -185,6 +184,22 @@ const theme = createTheme({
                         textDecoration: 'none',
                         '&:hover': {
                             color: '#E5E51A',
+                        },
+                    }
+                },
+            ]
+        },
+        MuiTextField: {
+            variants: [
+                {
+                    props: {
+                        variant: 'dialog'
+                    },
+                    style: {
+                        backgroundColor: 'white',
+                        borderRadius: '10px',
+                        '&:hover': {
+                            backgroundColor: 'white',
                         },
                     }
                 },

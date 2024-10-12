@@ -1,15 +1,39 @@
-*, ::before, ::after {
+*,
+::before,
+::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Scrollspy styles */
+
 html {
-	scroll-behavior: smooth;
+  scroll-behavior: smooth;
   scroll-padding-top: 4rem;
 }
 
 .active-scroll-spy {
   border-top: 5px solid #F2C304 !important;
   font-weight: bold;
+}
+
+/* Scroll animation styles */
+
+@keyframes fadeIn {
+  0% {
+    scale: 0.5;
+    opacity: 0.5;
+  }
+
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn linear forwards;
+  animation-timeline: view();
+  animation-range: cover 0% cover 10%;
 }

@@ -19,7 +19,7 @@ export default function DayCard(props) {
                 aria-controls={`panel${props.index}-content`}
                 sx={{ backgroundColor: "#ACACAC", borderRadius: "10px 10px 0 0" }}
             >
-                <Typography variant="h4">Day {props.day.order} - {props.day.title}</Typography>
+                <Typography variant="h4">{props.day.order} - {props.day.title}</Typography>
             </AccordionSummary>
 
             <AccordionDetails sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 2, backgroundColor: theme.palette.primary.light, borderRadius: "0 0 10px 10px" }}>

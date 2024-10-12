@@ -145,7 +145,6 @@ function SignUp() {
                         />
                     </FormControl>
 
-                    {/* FEEDBACK MESSAGE */}
                     {error && <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>}
 
                     <Button variant="standard" sx={{ mt: 2 }} onClick={handleRegister}>Register</Button>

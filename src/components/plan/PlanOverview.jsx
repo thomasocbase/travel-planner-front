@@ -94,7 +94,7 @@ export default function PlanOverview(props) {
 
     return (
         <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
-            <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={2}>
+            <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={3}>
                 <Box display="flex" justifyContent="space-between" flexWrap={"wrap"}>
                     <Box display="flex" gap={1}>
 
@@ -172,19 +172,18 @@ export default function PlanOverview(props) {
 
                 {/* SOCIAL STATS */}
                 <Box
-                    p={3}
-                    display="flex" gap={3} flexWrap={"wrap"}
-                    sx={{ backgroundColor: theme.palette.primary.medium, borderRadius: '10px' }}
+                    p={1}
+                    display="flex" gap={4} flexWrap={"wrap"}
                 >
-                    <Box display="flex" alignItems="center" gap={1} color="white">
-                        <StarsIcon />
-                        <Typography color='white'>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <StarsIcon sx={{ fontSize: "2rem" }}/>
+                        <Typography >
                             {props.plan.socialStats.likes} {props.plan.socialStats.likes > 1 ? "likes" : "like"}
                         </Typography>
                     </Box>
-                    <Box display="flex" alignItems="center" gap={1} color="white">
-                        <ClassIcon />
-                        <Typography color='white'>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <ClassIcon sx={{ fontSize: "2rem" }}/>
+                        <Typography>
                             Saved by {props.plan.socialStats.saves} {props.plan.socialStats.saves > 1 ? "members" : "member"}
                         </Typography>
                     </Box>
@@ -209,7 +208,7 @@ export default function PlanOverview(props) {
                             placeholder="Upload an image"
                             value={file}
                             onChange={handleFileChange}
-                            inputProps={{ accept: '.png, .jpeg', startAdornment: <FileUploadIcon /> }}
+                            inputProps={{ accept: '.png, .jpeg' }}
                             clearIconButtonProps={{
                                 title: "Remove",
                                 children: <CloseIcon fontSize="small" />

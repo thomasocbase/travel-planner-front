@@ -41,8 +41,6 @@ export default function AddDayButton(props) {
         });
     }
 
-    console.log("AddValue: ", addValue);
-
     return (
         <>
             {!isAdding &&
