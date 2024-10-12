@@ -145,7 +145,22 @@ function TravelPlan() {
         setEditingValue({ ...editingValue, image: file });
     }
 
+    function handleEditStart (data) {
+        setEditingValue({
+            category: standalonePlaceholderCardData.category,
+            title: standalonePlaceholderCardData.title,
+            description: standalonePlaceholderCardData.description,
+            location: standalonePlaceholderCardData.location,
+            time: standalonePlaceholderCardData.timeAllocation,
+            price: standalonePlaceholderCardData.price,
+            url: standalonePlaceholderCardData.url,
+            image: standalonePlaceholderCardData.image,
+        });
+        setIsOpenCreationDialog(true);
+    }
+
     console.log("Editing value", editingValue);
+    console.log("Plan", plan);
 
     return (
         <Box component="main">
@@ -181,7 +196,7 @@ function TravelPlan() {
                         </Box>
                         <Grid container spacing={2}>
                             <Grid item size={{ xs: 12, md: 6 }}>
-                                <ActivityCard data={standalonePlaceholderCardData} />
+                                <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
                             </Grid>
                         </Grid>
                     </Box>
@@ -217,7 +232,7 @@ function TravelPlan() {
                                         <Box key={index}>
                                             <DayCard day={day} index={index}>
                                                 {placeholderCardData.map((card, index) => (
-                                                    <ActivityCard data={card} />
+                                                    <ActivityCard data={card} edit={handleEditStart} />
                                                 ))}
                                             </DayCard>
                                         </Box>
@@ -248,7 +263,7 @@ function TravelPlan() {
 
                         <Grid container spacing={2}>
                             <Grid item size={{ xs: 12, md: 6 }}>
-                                <ActivityCard data={standalonePlaceholderCardData} />
+                                <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
                             </Grid>
                         </Grid>
                     </Box>
@@ -269,47 +284,47 @@ function TravelPlan() {
                         <Autocomplete
                             disablePortal
                             options={categories}
-                            value={editingValue?.category || null}
+                            value={editingValue?.category || ''}
                             onChange={(e, value) => setEditingValue({ ...editingValue, category: value })}
                             renderInput={(params) => <TextField {...params} label="Category" required />}
                         />
                         <TextField
                             label="Title (max 50 characters)"
                             required
-                            value={editingValue?.title || null}
+                            value={editingValue?.title || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, title: e.target.value })}
                         />
                         <TextField
                             multiline
                             rows={4}
                             label="Description (max 200 characters)"
-                            value={editingValue?.description || null}
+                            value={editingValue?.description || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, description: e.target.value })}
                         />
                         <TextField
                             label="Location (GPS coord)"
-                            value={editingValue?.location || null}
+                            value={editingValue?.location || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, location: e.target.value })}
                         />
                         <TextField
                             label="Time allocation (in hours)"
-                            value={editingValue?.time || null}
+                            value={editingValue?.time || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, time: e.target.value })}
                         />
                         <TextField
                             label="Price"
-                            value={editingValue?.price || null}
+                            value={editingValue?.price || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, price: e.target.value })}
                         />
                         <TextField
                             label="URL"
-                            value={editingValue?.url || null}
+                            value={editingValue?.url || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, url: e.target.value })}
                         />
                         <MuiFileInput
                             label="Image"
                             placeholder="Upload an image"
-                            value={editingValue?.image || null}
+                            value={editingValue?.image || ''}
                             onChange={handleFileChange}                         
                             inputProps={{ accept: '.png, .jpeg' }}
                             clearIconButtonProps={{

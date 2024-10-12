@@ -31,6 +31,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<LogIn />} />
         </Routes>
+        {/* {window.location.pathname !== '/signup' && <Footer /> } */}
         <Footer />
         <StatusSnackbar />
       </StatusContext.Provider>

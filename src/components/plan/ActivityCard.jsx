@@ -17,7 +17,7 @@ import ExploreIcon from '@mui/icons-material/Explore';
 import matchCategoryColor from '../../helpers/activityColor';
 import { useMediaQuery } from '@mui/material';
 
-export default function PlanCard(props) {
+export default function ActivityCard(props) {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -90,7 +90,7 @@ export default function PlanCard(props) {
                         </Box>
                     </Box>
                     <Box display="flex" sx={{ color: "black" }}>
-                        <IconButton color='inherit'>
+                        <IconButton color='inherit' onClick={props.edit}>
                             <EditIcon />
                         </IconButton>
                         <IconButton color='inherit'>
