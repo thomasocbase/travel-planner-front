@@ -14,7 +14,7 @@ html {
 }
 
 .active-scroll-spy {
-  border-top: 5px solid #F2C304 !important;
+  border-bottom: 5px solid #F2C304 !important;
   font-weight: bold;
 }
 
@@ -36,4 +36,20 @@ html {
   animation: fadeIn linear forwards;
   animation-timeline: view();
   animation-range: cover 0% cover 10%;
+}
+
+@keyframes addShadow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  }
+}
+
+.addShadow {
+  animation: addShadow linear forwards;
+  animation-timeline: view();
+  animation-range: 20% 50%;
 }

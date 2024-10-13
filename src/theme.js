@@ -180,26 +180,10 @@ const theme = createTheme({
                     },
                     style: {
                         fontFamily: 'Poppins, Montserrat, sans-serif',
-                        fontSize: '1.2rem',
+                        fontSize: '1.4rem',
                         textDecoration: 'none',
                         '&:hover': {
                             color: '#E5E51A',
-                        },
-                    }
-                },
-            ]
-        },
-        MuiTextField: {
-            variants: [
-                {
-                    props: {
-                        variant: 'dialog'
-                    },
-                    style: {
-                        backgroundColor: 'white',
-                        borderRadius: '10px',
-                        '&:hover': {
-                            backgroundColor: 'white',
                         },
                     }
                 },

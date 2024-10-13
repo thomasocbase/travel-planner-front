@@ -33,7 +33,7 @@ function PlanInternalNav() {
         <Container component="nav" maxWidth='lg'
             sx={{ position: 'sticky', zIndex: 500, top: 0, my: 4, px: 2 }}
         >
-            <Paper elevation={3} sx={{ backgroundColor: "white", borderRadius: "0 0 10px 10px" }}>
+            <Paper elevation={0} className='addShadow' sx={{ backgroundColor: "white", borderRadius: "0 0 10px 10px" }}>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
                     <Box display={'flex'} gap={2}>
@@ -43,7 +43,7 @@ function PlanInternalNav() {
                                     display: "flex", justifyContent: "center", alignItems: "center",
                                     height: "50px",
                                     px: 2, py: 3,
-                                    borderTop: "5px solid transparent"
+                                    borderBottom: "5px solid transparent"
                                 }}
                             >
                                 <Link

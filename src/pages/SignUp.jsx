@@ -54,10 +54,11 @@ function SignUp() {
     return (
         <>
             <Box
-                minHeight="90vh"
+                minHeight="90svh"
                 display="flex" justifyContent="center" alignItems="center"
                 backgroundColor="white"
             >
+
                 <Box
                     display="flex" flexDirection="column" alignItems="center"
                     backgroundColor={theme.palette.primary.dark}
@@ -79,12 +80,14 @@ function SignUp() {
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <AlternateEmailIcon sx={{ color: "white" }} />
+                                            <AlternateEmailIcon sx={{ color: "white", mr: 1 }} />
                                         </InputAdornment>
                                     ),
+                                    sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.medium } },
                                 },
                             }}
                             onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                            sx={{ color: "white", "& .MuiFormLabel-root": { color: "white" } }}
                         />
                         <TextField
                             id="register-username"
@@ -98,12 +101,14 @@ function SignUp() {
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <BadgeIcon sx={{ color: "white" }} />
+                                            <BadgeIcon sx={{ color: "white", mr: 1 }} />
                                         </InputAdornment>
                                     ),
+                                    sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.medium } },
                                 },
                             }}
                             onChange={(e) => setUserInfo({ ...userInfo, username: e.target.value })}
+                            sx={{ color: "white", "& .MuiFormLabel-root": { color: "white" } }}
                         />
                         <TextField
                             id="register-password"
@@ -117,12 +122,14 @@ function SignUp() {
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <PasswordIcon sx={{ color: "white" }} />
+                                            <PasswordIcon sx={{ color: "white", mr: 1 }} />
                                         </InputAdornment>
                                     ),
+                                    sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.medium } },
                                 },
                             }}
                             onChange={(e) => setUserInfo({ ...userInfo, password: e.target.value })}
+                            sx={{ color: "white", "& .MuiFormLabel-root": { color: "white" } }}
                         />
                         <TextField
                             id="register-password-confirm"
@@ -136,24 +143,25 @@ function SignUp() {
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <PasswordIcon sx={{ color: "white" }} />
+                                            <PasswordIcon sx={{ color: "white", mr: 1 }} />
                                         </InputAdornment>
                                     ),
+                                    sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.medium } },
                                 },
                             }}
                             onChange={(e) => setUserInfo({ ...userInfo, passwordConfirm: e.target.value })}
+                            sx={{ color: "white", "& .MuiFormLabel-root": { color: "white" } }}
                         />
                     </FormControl>
 
                     {error && <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>}
 
-                    <Button variant="standard" sx={{ mt: 2 }} onClick={handleRegister}>Register</Button>
+                    <Button variant="darkOverYellow" sx={{ mt: 2 }} onClick={handleRegister}>Register</Button>
 
-                    <Box display="flex" alignItems="baseline" gap={1}>
-                        <Typography fontSize="0.8rem" textAlign="center" mt={2} color="white">Already have an account?</Typography>
-                        <Link href="/login" color={theme.palette.primary.medium} fontSize="0.8rem">Log in</Link>
+                    <Box display="flex" alignItems="baseline" gap={1} mt={2}>
+                        <Typography variant="notice" textAlign="center" mt={2} color="white">Already have an account?</Typography>
+                        <Link href="/login" sx={{ color: theme.palette.primary.secondary, fontSize: "0.9rem", "&: hover": { color: theme.palette.primary.medium } }}>Log in</Link>
                     </Box>
-
                 </Box>
             </Box>
         </>
