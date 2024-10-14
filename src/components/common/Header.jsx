@@ -43,9 +43,9 @@ function Header() {
                         color: "black",
                         position: "absolute",
                         top: "50%",
-                        left: "50%",
+                        left: { xs: "100px", md: "50%" },
                         transform: "translate(-50%, -50%)",
-                        fontSize: "1.5rem",
+                        fontSize: { xs: "1.2rem", md: "1.5rem" },
                         fontWeight: 700,
                         fontFamily: 'Poppins, Montserrat, sans-serif',
                     }}
@@ -60,7 +60,7 @@ function Header() {
                 >
                     <Link href="/login" sx={{ color: '#000000' }}>Login</Link>
                     <Link href="/signup">
-                        <Button variant="darkOverYellow">Sign Up</Button>
+                        <Button variant="darkOverYellow2">Sign Up</Button>
                     </Link>
                 </Box>
             </Container>

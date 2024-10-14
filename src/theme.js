@@ -121,6 +121,20 @@ const theme = createTheme({
                 },
                 {
                     props: {
+                        variant: 'darkOverYellow2'
+                    },
+                    style: {
+                        backgroundColor: '#E5E51A',
+                        border: '2px solid #E5E51A',
+                        '&:hover': {
+                            backgroundColor: 'transparent',
+                            border: '2px solid #E5E51A',
+                            color: '#000',
+                        },
+                    }
+                },
+                {
+                    props: {
                         variant: 'yellowOverDark'
                     },
                     style: {
