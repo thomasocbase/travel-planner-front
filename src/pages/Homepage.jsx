@@ -81,7 +81,7 @@ function Homepage() {
             <Container component="section" maxWidth='lg' sx={{ mb: 2, px: 2 }}>
                 <Box
                     sx={{
-                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,1) 100%), url('${HeaderImage}')`,
+                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.5) 0%,rgba(34,34,34,0.5) 100%), url('${HeaderImage}')`,
                         backgroundSize: 'cover',
                         backgroundRepeat: 'no-repeat',
                         backgroundAttachment: 'fixed',
@@ -172,9 +172,9 @@ function Homepage() {
             < Container component="section" maxWidth='lg' sx={{ mt: 2, mb: 10, px: 2 }} className="fadeIn">
                 <Box display="flex" flexDirection="column" alignItems="center" p={5}>
                     <Typography variant='h2' textAlign="center">Follow us on social media</Typography>
-                    <Box display="flex" justifyContent="center" mt={2} >
+                    <Box display="flex" justifyContent="center" gap={1} mt={2} >
                         {socials.map((social, index) => (
-                            <IconButton key={index} href={social.link} size="large" sx={{ color: theme.palette.primary.dark, transition: '200ms ease-in-out', '&:hover': { color: theme.palette.primary.secondary, backgroundColor: theme.palette.primary.dark } }}>
+                            <IconButton key={index} href={social.link} size="large" sx={{ color: theme.palette.primary.main, backgroundColor: theme.palette.primary.dark, transition: '200ms ease-in-out', '&:hover': { backgroundColor: theme.palette.primary.light, color: theme.palette.primary.dark } }}>
                                 <social.icon fontSize="large" />
                             </IconButton>
                         ))
