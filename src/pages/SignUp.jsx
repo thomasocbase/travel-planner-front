@@ -47,8 +47,12 @@ function SignUp() {
     }
 
     function handleRegister() {
-        console.log(userInfo);
         validateData();
+
+        if (validateData()) {
+            console.log(userInfo);
+            // TODO: Send register request
+        }
     }
 
     return (
@@ -56,9 +60,7 @@ function SignUp() {
             <Box
                 minHeight="90svh"
                 display="flex" justifyContent="center" alignItems="center"
-                backgroundColor="white"
             >
-
                 <Box
                     display="flex" flexDirection="column" alignItems="center"
                     backgroundColor={theme.palette.primary.dark}
@@ -156,11 +158,13 @@ function SignUp() {
 
                     {error && <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>}
 
-                    <Button variant="darkOverYellow" sx={{ mt: 2 }} onClick={handleRegister}>Register</Button>
+                    <Button variant="darkOverYellow" sx={{ mt: 2 }} onClick={handleRegister}>Submit</Button>
 
-                    <Box display="flex" alignItems="baseline" gap={1} mt={2}>
-                        <Typography variant="notice" textAlign="center" mt={2} color="white">Already have an account?</Typography>
-                        <Link href="/login" sx={{ color: theme.palette.primary.secondary, fontSize: "0.9rem", "&: hover": { color: theme.palette.primary.medium } }}>Log in</Link>
+                    <Box mt={4}>
+                        <Typography variant="notice" textAlign="center" mt={2} color="white">
+                            Already have an account? &nbsp;
+                            <Link href="/login" underline="hover" sx={{ color: theme.palette.primary.secondary, fontSize: "0.9rem" }}>Log in</Link>
+                        </Typography>
                     </Box>
                 </Box>
             </Box>

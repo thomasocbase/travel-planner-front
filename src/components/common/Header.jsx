@@ -3,6 +3,7 @@ import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import { AppBar, Avatar, Box, Container, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography, useScrollTrigger, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoIcon from '../../assets/logo';
 
 function Header() {
     const theme = useTheme();
@@ -33,25 +34,22 @@ function Header() {
 
     return (
         <>
+            {/* NON-LOGGED NAVBAR */}
             <Container component="header" maxWidth="lg" sx={{
                 position: "relative",
                 borderRadius: '10px',
                 height: '60px'
             }}>
-                <Link href="/"
+                <Box component="a" href="/"
                     sx={{
-                        color: "black",
                         position: "absolute",
                         top: "50%",
                         left: { xs: "100px", md: "50%" },
                         transform: "translate(-50%, -50%)",
-                        fontSize: { xs: "1.2rem", md: "1.5rem" },
-                        fontWeight: 700,
-                        fontFamily: 'Poppins, Montserrat, sans-serif',
                     }}
                 >
-                    Travel Planner
-                </Link>
+                    <LogoIcon />
+                </Box>
                 <Box component="nav"
                     sx={{
                         position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)",
@@ -71,15 +69,15 @@ function Header() {
                     <Toolbar disableGutters sx={{ position: 'relative' }}>
 
                         {/* LOGO DESKTOP */}
-                        <Typography variant="h3" component="a" href="/"
+                        <Box component="a" href="/"
                             sx={{
                                 display: { xs: 'none', md: 'block' },
                                 textDecoration: 'none',
                                 position: 'absolute',
                             }}
                         >
-                            Travel Planner
-                        </Typography>
+                            <LogoIcon />
+                        </Box>
 
                         {/* PAGES NAV MOBILE */}
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -120,9 +118,7 @@ function Header() {
                         </Box>
 
                         {/* LOGO MOBILE */}
-                        <Typography
-                            variant="h5"
-                            noWrap
+                        <Box
                             component="a"
                             href="#app-bar-with-responsive-menu"
                             sx={{
@@ -131,8 +127,8 @@ function Header() {
                                 textDecoration: 'none',
                             }}
                         >
-                            Travel Planner
-                        </Typography>
+                            <LogoIcon />
+                        </Box>
 
                         {/* PAGES NAV DESKTOP */}
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', ml: 4 }}>
