@@ -8,6 +8,7 @@ import ActivityCard from '../components/plan/ActivityCard';
 import PlanOverview from '../components/plan/PlanOverview';
 import DayCard from '../components/plan/DayCard';
 import UnfoldLessDoubleIcon from '@mui/icons-material/UnfoldLessDouble';
+import UnfoldMoreDoubleIcon from '@mui/icons-material/UnfoldMoreDouble';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { placeholderCardData } from '../components/data/placeholderCards';
 import AddDayButton from '../components/plan/AddDayButton';
@@ -52,6 +53,7 @@ function TravelPlan() {
     const [editingValue, setEditingValue] = useState();
     const [isOpenCreationDialog, setIsOpenCreationDialog] = useState(false);
     const [creationError, setCreationError] = useState(null);
+    const [collapsedAccordions, setCollapsedAccordions] = useState([]);
 
     const [plan, setPlan] = useState({
         info: {
@@ -135,7 +137,7 @@ function TravelPlan() {
             setCreationError("Invalid URL");
             return;
         }
-        
+
         setIsOpenCreationDialog(false);
         // TODO: Send new activity data to backend
         setEditingValue(null);
@@ -145,7 +147,7 @@ function TravelPlan() {
         setEditingValue({ ...editingValue, image: file });
     }
 
-    function handleEditStart (data) {
+    function handleEditStart(data) {
         setEditingValue({
             category: standalonePlaceholderCardData.category,
             title: standalonePlaceholderCardData.title,
@@ -159,8 +161,25 @@ function TravelPlan() {
         setIsOpenCreationDialog(true);
     }
 
+    function updateAccordions(index) {
+        if (collapsedAccordions.includes(index)) {
+            setCollapsedAccordions(collapsedAccordions.filter(i => i !== index));
+        } else {
+            setCollapsedAccordions([...collapsedAccordions, index]);
+        }
+    }
+
+    function collapseAllAccordions() {
+        setCollapsedAccordions([...Array(placeholderDays.length).keys()]);
+    }
+
+    function expandAllAccordions() {
+        setCollapsedAccordions([]);
+    }
+
     console.log("Editing value", editingValue);
     console.log("Plan", plan);
+    console.log("Collapsed accordions", collapsedAccordions);
 
     return (
         <Box component="main">
@@ -220,19 +239,39 @@ function TravelPlan() {
                                             </Typography>
                                         </Box>
 
-                                        <Tooltip title="Collapse all" placement='left' arrow>
-                                            <IconButton sx={{ mr: 0.75 }}>
-                                                <UnfoldLessDoubleIcon sx={{ color: "white", fontSize: "2rem" }} />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <Box sx={{ mr: 0.75 }}>
+                                            <Tooltip title="Expand all" placement='top' arrow>
+                                                <IconButton onClick={expandAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === 0 ? "none" : "auto" }}>
+                                                    <UnfoldMoreDoubleIcon sx={{
+                                                        color: collapsedAccordions.length === 0 ? theme.palette.primary.medium : "white",
+                                                        fontSize: "2rem",
+                                                        '&:hover': { color: theme.palette.primary.secondary }
+                                                    }} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Collapse all" placement='top' arrow>
+                                                <IconButton onClick={collapseAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === placeholderDays.length ? "none" : "auto" }}>
+                                                    <UnfoldLessDoubleIcon sx={{
+                                                        color: collapsedAccordions.length === placeholderDays.length ? theme.palette.primary.medium : "white",
+                                                        fontSize: "2rem",
+                                                        '&:hover': { color: theme.palette.primary.secondary }
+                                                    }} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Box>
 
                                     </Box>
 
-                                    {placeholderDays.map((day, index) => (
-                                        <Box key={index}>
-                                            <DayCard day={day} index={index}>
-                                                {placeholderCardData.map((card, index) => (
-                                                    <ActivityCard data={card} edit={handleEditStart} />
+                                    {placeholderDays.map((day, dayIndex) => (
+                                        <Box key={dayIndex}>
+                                            <DayCard
+                                                day={day}
+                                                index={dayIndex}
+                                                expanded={!collapsedAccordions.includes(dayIndex)}
+                                                onChange={() => updateAccordions(dayIndex)}
+                                            >
+                                                {placeholderCardData.map((card, cardIndex) => (
+                                                    <ActivityCard key={cardIndex} data={card} edit={handleEditStart} />
                                                 ))}
                                             </DayCard>
                                         </Box>
@@ -325,7 +364,7 @@ function TravelPlan() {
                             label="Image"
                             placeholder="Upload an image"
                             value={editingValue?.image || ''}
-                            onChange={handleFileChange}                         
+                            onChange={handleFileChange}
                             inputProps={{ accept: '.png, .jpeg' }}
                             clearIconButtonProps={{
                                 title: "Remove",
@@ -333,7 +372,7 @@ function TravelPlan() {
                             }}
                             fullWidth
                         />
-                        {creationError && 
+                        {creationError &&
                             <Alert severity="warning">{creationError}</Alert>
                         }
                     </Box>

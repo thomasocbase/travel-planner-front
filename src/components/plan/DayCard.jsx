@@ -13,6 +13,8 @@ export default function DayCard(props) {
             defaultExpanded
             disableGutters
             sx={{ backgroundColor: "transparent", borderRadius: "10px", boxShadow: "0 0 10px 0 rgba(0,0,0,0.1)" }}
+            expanded={props.expanded}
+            onChange={props.onChange}
         >
             <AccordionSummary id={`panel${props.index}-header`}
                 expandIcon={<ExpandMoreIcon sx={{ color: "black", fontSize: "2rem" }} />}
