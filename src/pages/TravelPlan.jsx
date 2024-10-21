@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useMemo, useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
 import { Alert, Autocomplete, Box, Container, FormControl, IconButton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import PlanInternalNav from '../components/plan/PlanInternalNav';
@@ -17,6 +17,8 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import { MuiFileInput } from 'mui-file-input';
 import StatusContext from '../components/status/StatusContext';
+import { DndContext } from '@dnd-kit/core';
+import { SortableContext } from '@dnd-kit/sortable';
 
 const standalonePlaceholderCardData = {
     title: "Airbnb Trocadéro",
@@ -31,12 +33,14 @@ const standalonePlaceholderCardData = {
 
 const placeholderDays = [
     {
+        id: 1,
         title: "This is the title of the day",
         order: 1,
         duration: "8h",
         budget: "50",
     },
     {
+        id: 2,
         title: "And here is another",
         order: 2,
         duration: "6h",
@@ -54,6 +58,10 @@ function TravelPlan() {
     const [isOpenCreationDialog, setIsOpenCreationDialog] = useState(false);
     const [creationError, setCreationError] = useState(null);
     const [collapsedAccordions, setCollapsedAccordions] = useState([]);
+
+    const [days, setDays] = useState(placeholderDays);
+
+    const cardId = useMemo(() => placeholderCardData.map((card, index) => card.id), []);
 
     const [plan, setPlan] = useState({
         info: {
@@ -80,12 +88,12 @@ function TravelPlan() {
     }
 
     function updateDays(data) {
-        placeholderDays.push({
+        setDays([...days, {
             title: data,
             order: placeholderDays.length + 1,
             duration: "8h",
             budget: "50",
-        });
+        }]);
     }
 
     function handleCreationStart() {
@@ -179,7 +187,7 @@ function TravelPlan() {
 
     console.log("Editing value", editingValue);
     console.log("Plan", plan);
-    console.log("Collapsed accordions", collapsedAccordions);
+    console.log("Days", days);
 
     return (
         <Box component="main">
@@ -193,121 +201,125 @@ function TravelPlan() {
             <PlanInternalNav />
 
             <ScrollSpy>
+                <DndContext>
 
-                {/* BUCKET LIST */}
-                <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='bucketlist'>
-                    <Box
-                        p={3}
-                        sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
-                    >
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
-                                <Typography variant="h2" color="black">
-                                    Bucket list
-                                </Typography>
-                            </Box>
-                            <Tooltip title="Add new activity" placement='left' arrow>
-                                <IconButton onClick={handleCreationStart}>
-                                    <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-                        <Grid container spacing={2}>
-                            <Grid item size={{ xs: 12, md: 6 }}>
-                                <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Container>
-
-                {/* TRAVEL PLAN */}
-                <Container component="section" maxWidth="lg" sx={{ my: 3, px: 2 }} id='plan'>
-                    <Box
-                        p={3}
-                        sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}
-                    >
-                        <Grid container spacing={2}>
-                            <Grid item size={{ xs: 12, md: 7 }}>
-                                <Box display="flex" flexDirection="column" gap={2}>
-                                    <Box display="flex" justifyContent="space-between" alignItems="center">
-
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
-                                            <Typography variant="h2" color="white">
-                                                Travel Plan
-                                            </Typography>
-                                        </Box>
-
-                                        <Box sx={{ mr: 0.75 }}>
-                                            <Tooltip title="Expand all" placement='top' arrow>
-                                                <IconButton onClick={expandAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === 0 ? "none" : "auto" }}>
-                                                    <UnfoldMoreDoubleIcon sx={{
-                                                        color: collapsedAccordions.length === 0 ? theme.palette.primary.medium : "white",
-                                                        fontSize: "2rem",
-                                                        '&:hover': { color: theme.palette.primary.secondary }
-                                                    }} />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Collapse all" placement='top' arrow>
-                                                <IconButton onClick={collapseAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === placeholderDays.length ? "none" : "auto" }}>
-                                                    <UnfoldLessDoubleIcon sx={{
-                                                        color: collapsedAccordions.length === placeholderDays.length ? theme.palette.primary.medium : "white",
-                                                        fontSize: "2rem",
-                                                        '&:hover': { color: theme.palette.primary.secondary }
-                                                    }} />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </Box>
-
-                                    </Box>
-
-                                    {placeholderDays.map((day, dayIndex) => (
-                                        <Box key={dayIndex}>
-                                            <DayCard
-                                                day={day}
-                                                index={dayIndex}
-                                                expanded={!collapsedAccordions.includes(dayIndex)}
-                                                onChange={() => updateAccordions(dayIndex)}
-                                            >
-                                                {placeholderCardData.map((card, cardIndex) => (
-                                                    <ActivityCard key={cardIndex} data={card} edit={handleEditStart} />
-                                                ))}
-                                            </DayCard>
-                                        </Box>
-                                    ))}
+                    {/* BUCKET LIST */}
+                    <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='bucketlist'>
+                        <Box
+                            p={3}
+                            sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
+                        >
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                    <Typography variant="h2" color="black">
+                                        Bucket list
+                                    </Typography>
                                 </Box>
-                            </Grid>
-                            <Grid item size={{ xs: 12, md: 7 }}>
-                                <AddDayButton updateDays={updateDays} />
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Container>
-
-                {/* ARCHIVES */}
-                <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='archives'>
-                    <Box
-                        p={3}
-                        sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
-                    >
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
-                                <Typography variant="h2" color="black">
-                                    Archives
-                                </Typography>
+                                <Tooltip title="Add new activity" placement='left' arrow>
+                                    <IconButton onClick={handleCreationStart}>
+                                        <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
+                                    </IconButton>
+                                </Tooltip>
                             </Box>
-                        </Box>
-
-                        <Grid container spacing={2}>
-                            <Grid item size={{ xs: 12, md: 6 }}>
-                                <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
+                            <Grid container spacing={2}>
+                                <Grid item size={{ xs: 12, md: 6 }}>
+                                    <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </Container>
+                        </Box>
+                    </Container>
 
+                    {/* TRAVEL PLAN */}
+                    <Container component="section" maxWidth="lg" sx={{ my: 3, px: 2 }} id='plan'>
+                        <Box
+                            p={3}
+                            sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid item size={{ xs: 12, md: 7 }}>
+                                    <Box display="flex" flexDirection="column" gap={2}>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                                <Typography variant="h2" color="white">
+                                                    Travel Plan
+                                                </Typography>
+                                            </Box>
+
+                                            <Box sx={{ mr: 0.75 }}>
+                                                <Tooltip title="Expand all" placement='top' arrow>
+                                                    <IconButton onClick={expandAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === 0 ? "none" : "auto" }}>
+                                                        <UnfoldMoreDoubleIcon sx={{
+                                                            color: collapsedAccordions.length === 0 ? theme.palette.primary.medium : "white",
+                                                            fontSize: "2rem",
+                                                            '&:hover': { color: theme.palette.primary.secondary }
+                                                        }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Collapse all" placement='top' arrow>
+                                                    <IconButton onClick={collapseAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === placeholderDays.length ? "none" : "auto" }}>
+                                                        <UnfoldLessDoubleIcon sx={{
+                                                            color: collapsedAccordions.length === placeholderDays.length ? theme.palette.primary.medium : "white",
+                                                            fontSize: "2rem",
+                                                            '&:hover': { color: theme.palette.primary.secondary }
+                                                        }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+
+                                        </Box>
+
+                                        {days.map((day, dayIndex) => (
+                                            <Box key={dayIndex}>
+                                                <DayCard
+                                                    day={day}
+                                                    index={dayIndex}
+                                                    expanded={!collapsedAccordions.includes(dayIndex)}
+                                                    onChange={() => updateAccordions(dayIndex)}
+                                                >
+                                                    <SortableContext items={cardId}>
+                                                        {placeholderCardData.map((card, cardIndex) => (
+                                                            <ActivityCard key={cardIndex} data={card} edit={handleEditStart} />
+                                                        ))}
+                                                    </SortableContext>
+                                                </DayCard>
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                </Grid>
+                                <Grid item size={{ xs: 12, md: 7 }}>
+                                    <AddDayButton updateDays={updateDays} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Container>
+
+                    {/* ARCHIVES */}
+                    <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='archives'>
+                        <Box
+                            p={3}
+                            sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
+                        >
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                    <Typography variant="h2" color="black">
+                                        Archives
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Grid container spacing={2}>
+                                <Grid item size={{ xs: 12, md: 6 }}>
+                                    <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Container>
+
+                </DndContext>
             </ScrollSpy>
 
             {/* ACTIVITY CREATION DIALOG */}

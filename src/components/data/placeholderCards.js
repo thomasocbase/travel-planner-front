@@ -1,5 +1,6 @@
 export const placeholderCardData = [
     {
+        id: 1,
         title: "Airbnb Trocadéro",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
         image: "https://picsum.photos/id/42/800/600",
@@ -10,6 +11,7 @@ export const placeholderCardData = [
         location: "48.858285658772594, 2.3532079879966044",
     },
     {
+        id: 2,
         title: "Visit the Louvre",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
         image: "https://picsum.photos/id/57/800/600",
@@ -20,6 +22,7 @@ export const placeholderCardData = [
         location: "48.860294, 2.337631",
     },
     {
+        id: 3,
         title: "Lunch at Le Procope",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
         image: "https://picsum.photos/id/30/800/600",
@@ -30,6 +33,7 @@ export const placeholderCardData = [
         location: "48.856613, 2.336442",
     },
     {
+        id: 4,
         title: "Hike in the Bois de Vincennes",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
         image: "https://picsum.photos/id/70/800/600",
@@ -40,6 +44,7 @@ export const placeholderCardData = [
         location: "48.8196, 2.4346",
     },
     {
+        id: 5,
         title: "Shopping at Galeries Lafayette",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
         image: "https://picsum.photos/id/119/800/600",

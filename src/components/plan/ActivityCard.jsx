@@ -15,11 +15,9 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import ExploreIcon from '@mui/icons-material/Explore';
 import matchCategoryColor from '../../helpers/activityColor';
-import { useMediaQuery } from '@mui/material';
 
 export default function ActivityCard(props) {
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     function matchCategoryIcon(category) {
         const fontSize = "1.2rem";
@@ -50,13 +48,16 @@ export default function ActivityCard(props) {
                 borderRadius: '10px',
                 borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
             }}>
-                <CardContent sx={{ display: "flex", gap: 2, flexDirection: isSmallScreen ? "column-reverse" : "row" }}>
-                    {isSmallScreen ? (
-                        <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "100%", aspectRatio: 4 / 3, borderRadius: "5px" }} />
-                    ) : (
-                        <CardMedia component="img" src={props.data.image} alt={props.data.title} sx={{ maxWidth: "33%", aspectRatio: 1, borderRadius: "5px" }} />
-                    )
-                    }
+                <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs:"column-reverse", sm: "row" } }}>
+                    <CardMedia
+                        component="img"
+                        src={props.data.image} alt={props.data.title}
+                        sx={{
+                            maxWidth: { xs: "100%", sm: "33%" },
+                            aspectRatio: { xs: "4 / 3", sm: "1" },
+                            borderRadius: "5px"
+                        }}
+                    />
                     <Box display="flex" flexDirection="column" gap={1}>
                         <Box display="flex" alignItems="center" justifyContent="space-between">
                             <Typography variant="h5">{props.data.title}</Typography>
@@ -74,7 +75,9 @@ export default function ActivityCard(props) {
                         </Typography>
                         <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
                             <LinkIcon />
-                            <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>View</Link>
+                            <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>
+                                {props.data.url.length > 25 ? (props.data.url.slice(0, 25) + "...") : props.data.url}
+                            </Link>
                         </Box>
                     </Box>
                 </CardContent>
