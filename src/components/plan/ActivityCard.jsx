@@ -48,7 +48,7 @@ export default function ActivityCard(props) {
                 borderRadius: '10px',
                 borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
             }}>
-                <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs:"column-reverse", sm: "row" } }}>
+                <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs: "column-reverse", sm: "row" } }}>
                     <CardMedia
                         component="img"
                         src={props.data.image} alt={props.data.title}
@@ -59,20 +59,23 @@ export default function ActivityCard(props) {
                         }}
                     />
                     <Box display="flex" flexDirection="column" gap={1}>
+                        
                         <Box display="flex" alignItems="center" justifyContent="space-between">
-                            <Typography variant="h5">{props.data.title}</Typography>
+                            <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
+                                sx={{
+                                    alignSelf: "start",
+                                    fontFamily: "Poppins, sans-serif", fontSize: "0.75rem", fontWeight: 600,
+                                    px: 1,
+                                    color: matchCategoryColor(props.data.category)
+                                }}
+                            />
                             <DragIndicatorIcon sx={{ color: theme.palette.primary.light }} />
                         </Box>
-                        <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
-                            sx={{
-                                alignSelf: "start",
-                                fontFamily: "Poppins, sans-serif", fontSize: "0.75rem", fontWeight: 600,
-                                px: 1,
-                                color: matchCategoryColor(props.data.category)
-                            }} />
-                        <Typography variant="smaller">
-                            {props.data.description}
-                        </Typography>
+
+                        <Typography variant="h5" mt={2}>{props.data.title}</Typography>
+
+                        <Typography variant="smaller">{props.data.description}</Typography>
+
                         <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
                             <LinkIcon />
                             <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>
@@ -82,6 +85,7 @@ export default function ActivityCard(props) {
                     </Box>
                 </CardContent>
                 <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
+                    
                     <Box display={"flex"} gap={2}>
                         <Box display="flex" alignItems={"center"} gap={1}>
                             <AccessTimeIcon />
@@ -92,6 +96,7 @@ export default function ActivityCard(props) {
                             <Typography variant='smaller'>{props.data.price}€</Typography>
                         </Box>
                     </Box>
+                    
                     <Box display="flex" sx={{ color: "black" }}>
                         <IconButton color='inherit' onClick={props.edit}>
                             <EditIcon />

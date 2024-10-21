@@ -18,6 +18,10 @@ html {
   font-weight: bold;
 }
 
+.active-scroll-spy > a {
+  color: #000 !important;
+}
+
 /* Scroll animation styles */
 
 @keyframes fadeIn {
@@ -51,5 +55,12 @@ html {
 .addShadow {
   animation: addShadow linear forwards;
   animation-timeline: view();
-  animation-range: 20% 50%;
+  animation-range: 30% 60%;
+}
+
+/* Leaflet */
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
 }

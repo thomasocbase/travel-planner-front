@@ -5,12 +5,14 @@ import { useMediaQuery } from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import InboxIcon from '@mui/icons-material/Inbox';
+import MapIcon from '@mui/icons-material/Map';
 
 function PlanInternalNav() {
     const theme = useTheme();
 
     const navItems = [
         // { name: 'Overview', anchor: 'overview' },
+        { name: 'Map', anchor: 'map', icon: <MapIcon /> },
         { name: 'Bucket List', anchor: 'bucketlist', icon: <ListIcon /> },
         { name: 'Plan', anchor: 'plan', icon: <CalendarMonthIcon /> },
         { name: 'Archives', anchor: 'archives', icon: <InboxIcon /> },
@@ -31,7 +33,7 @@ function PlanInternalNav() {
 
     return (
         <Container component="nav" maxWidth='lg'
-            sx={{ position: 'sticky', zIndex: 500, top: 0, my: 4, px: 2 }}
+            sx={{ position: 'sticky', zIndex: 9999, top: 0, my: 4, px: 2 }}
         >
             <Paper elevation={0} className='addShadow' sx={{ backgroundColor: "white", borderRadius: "0 0 10px 10px" }}>
 
@@ -50,6 +52,7 @@ function PlanInternalNav() {
                                     variant="subnav"
                                     key={index}
                                     href={`#${item.anchor}`}
+                                    sx={{ color: "grey" }}
                                 >
                                     {isSmallScreen && item.icon}
                                     {!isSmallScreen && item.name}
