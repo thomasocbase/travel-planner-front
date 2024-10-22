@@ -11,6 +11,8 @@ import PlanMap from './PlanMap';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import ConfirmDialog from '../ConfirmDialog';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function DayCard(props) {
     const theme = useTheme();
@@ -66,9 +68,9 @@ export default function DayCard(props) {
                 key={props.index}
                 defaultExpanded
                 disableGutters
-                sx={{ backgroundColor: "transparent", borderRadius: "10px", boxShadow: "0 0 10px 0 rgba(0,0,0,0.1)" }}
                 expanded={props.expanded}
                 onChange={props.onChange}
+                sx={{ backgroundColor: "transparent", borderRadius: "10px", boxShadow: "0 0 10px 0 rgba(0,0,0,0.1)" }}
             >
                 <AccordionSummary id={`panel${props.index}-header`}
                     expandIcon={<ExpandMoreIcon sx={{ color: "black", fontSize: "2rem" }} />}

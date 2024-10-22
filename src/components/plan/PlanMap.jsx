@@ -28,8 +28,6 @@ export default function PlanMap(props) {
     // Zoom level is inversely proportional to distance
     const zoom = Math.round(14 - Math.log2(difference / 0.01));
 
-    console.log("Zoom level:", zoom);
-
     return (
         <Box
             height={500}

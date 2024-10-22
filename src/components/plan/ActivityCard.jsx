@@ -1,4 +1,4 @@
-import { Box, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Link, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Link, Skeleton, Typography, useTheme } from "@mui/material";
 import React from "react";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -15,9 +15,25 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import ExploreIcon from '@mui/icons-material/Explore';
 import matchCategoryColor from '../../helpers/activityColor';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function ActivityCard(props) {
     const theme = useTheme();
+
+    const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
+        id: props.data.id,
+        data: {
+            type: 'activity',
+            day: { ...props.data },
+        }
+    });
+
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
 
     function matchCategoryIcon(category) {
         const fontSize = "1.2rem";
@@ -42,73 +58,78 @@ export default function ActivityCard(props) {
     }
 
     return (
-        <>
-            <Card sx={{
+        <Card
+            ref={setNodeRef}
+            sx={{
                 backgroundColor: "white",
                 borderRadius: '10px',
                 borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
-            }}>
-                <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs: "column-reverse", sm: "row" } }}>
-                    <CardMedia
-                        component="img"
-                        src={props.data.image} alt={props.data.title}
-                        sx={{
-                            maxWidth: { xs: "100%", sm: "33%" },
-                            aspectRatio: { xs: "4 / 3", sm: "1" },
-                            borderRadius: "5px"
-                        }}
-                    />
-                    <Box display="flex" flexDirection="column" gap={1}>
+                filter: isDragging ? 'blur(1px)' : 'none',
+                ...style
+            }}
+        >
+            <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs: "column-reverse", sm: "row" } }}>
+                <CardMedia
+                    component="img"
+                    src={props.data.image} alt={props.data.title}
+                    sx={{
+                        maxWidth: { xs: "100%", sm: "33%" },
+                        aspectRatio: { xs: "4 / 3", sm: "1" },
+                        borderRadius: "5px",
                         
-                        <Box display="flex" alignItems="center" justifyContent="space-between">
-                            <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
-                                sx={{
-                                    alignSelf: "start",
-                                    fontFamily: "Poppins, sans-serif", fontSize: "0.75rem", fontWeight: 600,
-                                    px: 1,
-                                    color: matchCategoryColor(props.data.category)
-                                }}
-                            />
-                            <DragIndicatorIcon sx={{ color: theme.palette.primary.light }} />
-                        </Box>
+                    }}
+                />
+                <Box display="flex" flexDirection="column" gap={1}>
 
-                        <Typography variant="h5" mt={2}>{props.data.title}</Typography>
-
-                        <Typography variant="smaller">{props.data.description}</Typography>
-
-                        <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
-                            <LinkIcon />
-                            <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>
-                                {props.data.url.length > 25 ? (props.data.url.slice(0, 25) + "...") : props.data.url}
-                            </Link>
-                        </Box>
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                        <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
+                            sx={{
+                                alignSelf: "start",
+                                fontFamily: "Poppins, sans-serif", fontSize: "0.75rem", fontWeight: 600,
+                                px: 1,
+                                color: matchCategoryColor(props.data.category)
+                            }}
+                        />
+                        <DragIndicatorIcon
+                            sx={{ color: theme.palette.primary.medium, cursor: "grab" }}
+                            {...attributes} {...listeners}
+                        />
                     </Box>
-                </CardContent>
-                <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
-                    
-                    <Box display={"flex"} gap={2}>
-                        <Box display="flex" alignItems={"center"} gap={1}>
-                            <AccessTimeIcon />
-                            <Typography variant='smaller'>{props.data.timeAllocation}h</Typography>
-                        </Box>
-                        <Box display="flex" alignItems={"center"} gap={1}>
-                            <CreditCardIcon />
-                            <Typography variant='smaller'>{props.data.price}€</Typography>
-                        </Box>
-                    </Box>
-                    
-                    <Box display="flex" sx={{ color: "black" }}>
-                        <IconButton color='inherit' onClick={props.edit}>
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton color='inherit'>
-                            <ArchiveIcon />
-                        </IconButton>
-                    </Box>
-                </CardActions>
-            </Card>
 
-            {/* EDIT DIALOG */}
-        </>
+                    <Typography variant="h5" mt={2}>{props.data.title}</Typography>
+
+                    <Typography variant="smaller">{props.data.description}</Typography>
+
+                    <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
+                        <LinkIcon />
+                        <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>
+                            {props.data.url.length > 25 ? (props.data.url.slice(0, 25) + "...") : props.data.url}
+                        </Link>
+                    </Box>
+                </Box>
+            </CardContent>
+            <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
+
+                <Box display={"flex"} gap={2}>
+                    <Box display="flex" alignItems={"center"} gap={1}>
+                        <AccessTimeIcon />
+                        <Typography variant='smaller'>{props.data.timeAllocation}h</Typography>
+                    </Box>
+                    <Box display="flex" alignItems={"center"} gap={1}>
+                        <CreditCardIcon />
+                        <Typography variant='smaller'>{props.data.price}€</Typography>
+                    </Box>
+                </Box>
+
+                <Box display="flex" sx={{ color: "black" }}>
+                    <IconButton color='inherit' onClick={props.edit}>
+                        <EditIcon />
+                    </IconButton>
+                    <IconButton color='inherit'>
+                        <ArchiveIcon />
+                    </IconButton>
+                </Box>
+            </CardActions>
+        </Card>
     )
 }

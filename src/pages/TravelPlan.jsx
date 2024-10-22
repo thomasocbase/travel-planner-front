@@ -13,13 +13,13 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { placeholderCardData } from '../components/data/placeholderCards';
 import AddDayButton from '../components/plan/AddDayButton';
 import ConfirmDialog from '../components/ConfirmDialog';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import { MuiFileInput } from 'mui-file-input';
 import StatusContext from '../components/status/StatusContext';
-import { DndContext } from '@dnd-kit/core';
-import { SortableContext } from '@dnd-kit/sortable';
 import PlanMap from '../components/plan/PlanMap';
+import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
+import { arrayMove, rectSwappingStrategy, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { createPortal } from 'react-dom';
 
 const standalonePlaceholderCardData = {
     title: "Airbnb Trocadéro",
@@ -31,6 +31,31 @@ const standalonePlaceholderCardData = {
     category: "Accommodation",
     location: "48.858285658772594, 2.3532079879966044",
 };
+
+const bucketlistPlaceholderCards = [
+    {
+        id: 15,
+        title: "Lunch at Le Procope",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+        image: "https://picsum.photos/id/30/800/600",
+        url: "https://www.leprocope.com/",
+        price: 30,
+        timeAllocation: 1,
+        category: "Meal",
+        location: "48.856613, 2.336442",
+    },
+    {
+        id: 16,
+        title: "Hike in the Bois de Vincennes",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+        image: "https://picsum.photos/id/70/800/600",
+        url: "https://www.boisdevincennes.com/",
+        price: 0,
+        timeAllocation: 4,
+        category: "Hike",
+        location: "48.8196, 2.4346",
+    },
+]
 
 const placeholderDays = [
     {
@@ -60,12 +85,15 @@ function TravelPlan() {
     const [creationError, setCreationError] = useState(null);
     const [collapsedAccordions, setCollapsedAccordions] = useState([]);
     const [days, setDays] = useState(placeholderDays);
+
+    // Map markers (currently placeholder values)
     const [markers, setMarkers] = useState([
         { position: [48.857, 2.348], popup: "Eiffel Tower" },
         { position: [48.859, 2.294], popup: "Arc de Triomphe" },
         { position: [50.531, 2.640], popup: "Béthune" },
     ]);
 
+    // Placeholder plan data
     const [plan, setPlan] = useState({
         info: {
             title: "My Travel Plan Title",
@@ -86,6 +114,9 @@ function TravelPlan() {
         }
     });
 
+    const [bucketlistCards, setBucketlistCards] = useState(bucketlistPlaceholderCards);
+    const [activeBucketlistCard, setActiveBucketlistCard] = useState(null);
+
     function updatePlan(data) {
         setPlan(data);
     }
@@ -99,6 +130,8 @@ function TravelPlan() {
         }]);
     }
 
+
+    // ACTIVITY CREATION/EDITION FUNCTIONS
     function handleCreationStart() {
         setIsOpenCreationDialog(true);
         setEditingValue({
@@ -150,7 +183,7 @@ function TravelPlan() {
         }
 
         setIsOpenCreationDialog(false);
-        // TODO: Send new activity data to backend
+        // Todo: Send new activity data to backend
         setEditingValue(null);
     }
 
@@ -172,6 +205,7 @@ function TravelPlan() {
         setIsOpenCreationDialog(true);
     }
 
+    // ACCORDION FUNCTIONS
     function updateAccordions(index) {
         if (collapsedAccordions.includes(index)) {
             setCollapsedAccordions(collapsedAccordions.filter(i => i !== index));
@@ -188,8 +222,37 @@ function TravelPlan() {
         setCollapsedAccordions([]);
     }
 
-    console.log("Editing value", editingValue);
-    console.log("Plan", plan);
+    // DRAG AND DROP FUNCTIONS
+    function handleDragStart(event) {
+        console.log("Drag start");
+        console.log("Active:", event.active);
+
+        if (event.active.data.current.type === "activity") {
+            setActiveBucketlistCard(event.active.data.current?.day);
+            return;
+        }
+    }
+
+    function handleDragEnd(event) {
+        const { active, over } = event;
+
+        console.log("Drag end");
+        console.log("Active:", active);
+        console.log("Over:", over);
+
+        if (active.id !== over.id) {
+            setBucketlistCards((card) => {
+                const activeIndex = card.findIndex((c) => c.id === active.id);
+                const overIndex = card.findIndex((c) => c.id === over.id);
+
+                return arrayMove(card, activeIndex, overIndex);
+            });
+        }
+
+        console.log("Bucketlist cards:", bucketlistCards);
+        return;
+    }
+
 
     return (
         <Box component="main" mb={10}>
@@ -203,7 +266,10 @@ function TravelPlan() {
             <PlanInternalNav />
 
             <ScrollSpy>
-                <DndContext>
+                <DndContext
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                >
 
                     {/* MAP */}
                     <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='map'>
@@ -216,6 +282,7 @@ function TravelPlan() {
                             p={3}
                             sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
                         >
+                            {/* HEADER */}
                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
@@ -229,11 +296,18 @@ function TravelPlan() {
                                     </IconButton>
                                 </Tooltip>
                             </Box>
-                            <Grid container spacing={2}>
-                                <Grid item size={{ xs: 12, md: 6 }}>
-                                    <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
+
+                            {/* ACTIVITY CARDS */}
+                            <SortableContext items={bucketlistCards}>
+                                <Grid container spacing={2}>
+                                    {bucketlistCards.map((card, index) => (
+                                        <Grid item size={{ sm: 12, md: 6 }}>
+                                            <ActivityCard key={index} data={card} edit={handleEditStart} />
+                                        </Grid>
+                                    ))}
                                 </Grid>
-                            </Grid>
+                            </SortableContext>
+
                         </Box>
                     </Container>
 
@@ -243,8 +317,8 @@ function TravelPlan() {
                             p={3}
                             sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}
                         >
-
                             <Box display="flex" flexDirection="column" gap={2}>
+                                {/* HEADER */}
                                 <Box display="flex" justifyContent="space-between" alignItems="center">
 
                                     <Box display="flex" alignItems="center" gap={1}>
@@ -277,23 +351,27 @@ function TravelPlan() {
 
                                 </Box>
 
-                                {days.map((day, dayIndex) => (
-                                    <Box key={dayIndex}>
-                                        <DayCard
-                                            day={day}
-                                            index={dayIndex}
-                                            expanded={!collapsedAccordions.includes(dayIndex)}
-                                            onChange={() => updateAccordions(dayIndex)}
-                                        >
+                                {/* DAYS */}
+                                <SortableContext items={days}>
+                                    {days.map((day, dayIndex) => (
+                                        <Box key={dayIndex}>
+                                            <DayCard
+                                                day={day}
+                                                index={dayIndex}
+                                                expanded={!collapsedAccordions.includes(dayIndex)}
+                                                onChange={() => updateAccordions(dayIndex)}
+                                            >
 
-                                            {placeholderCardData.map((card, cardIndex) => (
-                                                <ActivityCard key={cardIndex} data={card} edit={handleEditStart} />
-                                            ))}
+                                                {placeholderCardData.map((card, cardIndex) => (
+                                                    <ActivityCard key={cardIndex} data={card} edit={handleEditStart} />
+                                                ))}
 
-                                        </DayCard>
-                                    </Box>
-                                ))}
+                                            </DayCard>
+                                        </Box>
+                                    ))}
+                                </SortableContext>
                             </Box>
+
                             <Box mt={2}>
                                 <AddDayButton updateDays={updateDays} />
                             </Box>
@@ -322,6 +400,13 @@ function TravelPlan() {
                             </Grid>
                         </Box>
                     </Container>
+
+                    {/* DRAG OVERLAY */}
+                    <DragOverlay>
+                        {activeBucketlistCard && (
+                            <ActivityCard data={activeBucketlistCard} edit={handleEditStart} />
+                        )}
+                    </DragOverlay>
 
                 </DndContext>
             </ScrollSpy>
