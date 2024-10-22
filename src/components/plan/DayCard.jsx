@@ -1,6 +1,6 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Typography, useTheme } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Divider, IconButton, TextField, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import React from 'react';
+import React, { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -8,9 +8,48 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlanMap from './PlanMap';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function DayCard(props) {
     const theme = useTheme();
+
+    const [markers, setMarkers] = useState([
+        // Placeholder values
+        { position: [48.857, 2.348], popup: "Eiffel Tower" },
+        { position: [48.859, 2.294], popup: "Arc de Triomphe" },
+    ]);
+
+    const [editingValue, setEditingValue] = useState();
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [error, setError] = useState(null);
+
+    function handleEditTitleStart() {
+        setIsEditingTitle(true);
+        setEditingValue(props.day.title);
+    }
+
+    function handleEditTitleSubmit() {
+        if (!editingValue || editingValue.length === 0) {
+            setError("Title cannot be empty");
+            return;
+        }
+        if (editingValue.length > 50) {
+            setError("Title cannot exceed 50 characters");
+            return;
+        }
+
+        setError(null);
+        setIsEditingTitle(false);
+
+        // TODO: Send new title to backend
+    }
+
+    function handleEnterPress(e) {
+        if (e.key === "Enter") {
+            handleEditTitleSubmit();
+        }
+    }
 
     return (
         <Accordion
@@ -53,38 +92,59 @@ export default function DayCard(props) {
                 <Grid container spacing={2}>
 
                     {/* ACTIVITY CARDS */}
-                    <Grid item size={{ xs: 12, md: 8 }}>
+                    <Grid item size={{ sm: 12, md: 8 }}>
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                             {props.children}
                         </Box>
                     </Grid>
 
                     {/* SIDEBAR */}
-                    <Grid component="aside" item size={{ xs: 12, md: 4 }} mb={2}>
+                    <Grid item size={{ sm: 12, md: 4 }} component="aside" mb={2}>
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 
-                            <Box>
-                                <PlanMap
-                                    markers={[
-                                        { position: [48.857, 2.348], popup: "Eiffel Tower" },
-                                        { position: [48.859, 2.294], popup: "Arc de Triomphe" },
-                                    ]}
-                                    attribution={false}
-                                />
-                            </Box>
+                            <PlanMap
+                                markers={markers}
+                                attribution={false}
+                            />
 
                             <Box sx={{
-                                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                                display: "flex", flexDirection: "column", alignItems: "center", gap: 1,
                                 backgroundColor: "white", borderRadius: "10px", p: 2
                             }}>
-                                <Box sx={{ display: "flex", gap: 1 }}>
-                                    <EditIcon />
-                                    <Typography variant="normal">Edit day title</Typography>
-                                </Box>
-                                <Box sx={{ display: "flex", gap: 1 }}>
+                                {isEditingTitle ? (
+                                    <>
+                                        <Box sx={{ display: "flex", gap: 1 }}>
+                                            <TextField
+                                                variant='standard'
+                                                value={editingValue}
+                                                onChange={(e) => setEditingValue(e.target.value)}
+                                                sx={{ minWidth: "200px" }}
+                                                onKeyDown={handleEnterPress}
+                                                fullWidth
+                                            />
+                                            <IconButton onClick={handleEditTitleSubmit}>
+                                                <DoneIcon sx={{ color: theme.palette.primary.secondary }} />
+                                            </IconButton>
+                                            <IconButton onClick={() => {
+                                                setError(null);
+                                                setIsEditingTitle(false)
+                                            }} >
+                                                <CloseIcon />
+                                            </IconButton>
+                                        </Box>
+                                        {error && <Alert severity="warning">{error}</Alert>}
+                                    </>
+                                ) : (
+                                    <Button sx={{ display: "flex", gap: 1 }} onClick={handleEditTitleStart}>
+                                        <EditIcon />
+                                        <Typography variant="normal">Edit day title</Typography>
+                                    </Button>
+                                )}
+                                <Divider sx={{ width: "100%" }} />
+                                <Button sx={{ display: "flex", gap: 1 }}>
                                     <DeleteIcon sx={{ color: "red" }} />
                                     <Typography variant="normal" color='red'>Delete day</Typography>
-                                </Box>
+                                </Button>
                             </Box>
 
                         </Box>

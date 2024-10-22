@@ -63,6 +63,7 @@ function TravelPlan() {
     const [markers, setMarkers] = useState([
         { position: [48.857, 2.348], popup: "Eiffel Tower" },
         { position: [48.859, 2.294], popup: "Arc de Triomphe" },
+        { position: [50.531, 2.640], popup: "Béthune" },
     ]);
 
     const [plan, setPlan] = useState({
