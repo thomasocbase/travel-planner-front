@@ -6,7 +6,14 @@ function ConfirmDialog(props) {
     const theme = useTheme();
 
     return (
-        <Dialog open={props.open} onClose={props.onClose} scroll="paper" maxWidth="xs" fullWidth>
+        <Dialog
+            open={props.open}
+            onClose={props.onClose}
+            scroll="paper"
+            maxWidth="xs"
+            fullWidth
+            sx={{ zIndex: 9999 }}
+        >
             <DialogTitle sx={{ backgroundColor: theme.palette.primary.dark }}>
                 <Box display="flex" alignItems="center" justifyContent="space-between">
                     <Typography variant="h5" color='white'>{props.title}</Typography>

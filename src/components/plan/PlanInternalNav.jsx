@@ -33,7 +33,7 @@ function PlanInternalNav() {
 
     return (
         <Container component="nav" maxWidth='lg'
-            sx={{ position: 'sticky', zIndex: 9999, top: 0, my: 4, px: 2 }}
+            sx={{ position: 'sticky', zIndex: 9995, top: 0, my: 4, px: 2 }}
         >
             <Paper elevation={0} className='addShadow' sx={{ backgroundColor: "white", borderRadius: "0 0 10px 10px" }}>
 
