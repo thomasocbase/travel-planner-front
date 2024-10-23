@@ -17,6 +17,7 @@ import ExploreIcon from '@mui/icons-material/Explore';
 import matchCategoryColor from '../../helpers/activityColor';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
 
 export default function ActivityCard(props) {
     const theme = useTheme();
@@ -26,7 +27,8 @@ export default function ActivityCard(props) {
         data: {
             type: 'activity',
             day: { ...props.data },
-        }
+        },
+        animateLayoutChanges: () => false
     });
 
 
@@ -64,7 +66,7 @@ export default function ActivityCard(props) {
                 backgroundColor: "white",
                 borderRadius: '10px',
                 borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
-                filter: isDragging ? 'blur(1px)' : 'none',
+                filter: `${isDragging ? 'opacity(20%)' : ''} ${props.data.isArchived ? 'grayscale(1)' : ''}`,
                 ...style
             }}
         >
@@ -76,7 +78,7 @@ export default function ActivityCard(props) {
                         maxWidth: { xs: "100%", sm: "33%" },
                         aspectRatio: { xs: "4 / 3", sm: "1" },
                         borderRadius: "5px",
-                        
+
                     }}
                 />
                 <Box display="flex" flexDirection="column" gap={1}>
@@ -125,8 +127,8 @@ export default function ActivityCard(props) {
                     <IconButton color='inherit' onClick={props.edit}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton color='inherit'>
-                        <ArchiveIcon />
+                    <IconButton color='inherit' onClick={props.archive}>
+                        {props.data.isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
                     </IconButton>
                 </Box>
             </CardActions>

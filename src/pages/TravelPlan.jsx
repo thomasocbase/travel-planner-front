@@ -18,44 +18,9 @@ import { MuiFileInput } from 'mui-file-input';
 import StatusContext from '../components/status/StatusContext';
 import PlanMap from '../components/plan/PlanMap';
 import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
-import { arrayMove, rectSwappingStrategy, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { createPortal } from 'react-dom';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-const standalonePlaceholderCardData = {
-    title: "Airbnb Trocadéro",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
-    image: "https://picsum.photos/id/42/800/600",
-    url: "https://www.airbnb.com/rooms/12345678",
-    price: 100,
-    timeAllocation: 2,
-    category: "Accommodation",
-    location: "48.858285658772594, 2.3532079879966044",
-};
-
-const bucketlistPlaceholderCards = [
-    {
-        id: 15,
-        title: "Lunch at Le Procope",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
-        image: "https://picsum.photos/id/30/800/600",
-        url: "https://www.leprocope.com/",
-        price: 30,
-        timeAllocation: 1,
-        category: "Meal",
-        location: "48.856613, 2.336442",
-    },
-    {
-        id: 16,
-        title: "Hike in the Bois de Vincennes",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
-        image: "https://picsum.photos/id/70/800/600",
-        url: "https://www.boisdevincennes.com/",
-        price: 0,
-        timeAllocation: 4,
-        category: "Hike",
-        location: "48.8196, 2.4346",
-    },
-]
 
 const placeholderDays = [
     {
@@ -79,21 +44,35 @@ const categories = ["Hike", "Tour", "Accommodation", "Meal", "Shopping", "Transp
 
 function TravelPlan() {
     const theme = useTheme();
+    const { setAppStatus } = useContext(StatusContext);
 
     const [editingValue, setEditingValue] = useState();
     const [isOpenCreationDialog, setIsOpenCreationDialog] = useState(false);
     const [creationError, setCreationError] = useState(null);
     const [collapsedAccordions, setCollapsedAccordions] = useState([]);
+
+    const [activities, setActivities] = useState(placeholderCardData);
+
+    const [activeCard, setActiveCard] = useState(null);
+
     const [days, setDays] = useState(placeholderDays);
+    const [activeDay, setActiveDay] = useState(null);
 
-    // Map markers (currently placeholder values)
-    const [markers, setMarkers] = useState([
-        { position: [48.857, 2.348], popup: "Eiffel Tower" },
-        { position: [48.859, 2.294], popup: "Arc de Triomphe" },
-        { position: [50.531, 2.640], popup: "Béthune" },
-    ]);
+    // MAP MARKERS
+    const [markers, setMarkers] = useState([]);
 
-    // Placeholder plan data
+    useEffect(() => {
+        const newMarkers =
+            activities.map((activity) => {
+                const [lat, lng] = activity.location.split(',').map(coord => parseFloat(coord));
+                return { position: [lat, lng], popup: activity.title };
+            });
+        setMarkers(newMarkers);
+    }, [activities]);
+
+    console.log("Markers:", markers);
+
+    // PLACEHOLDER PLAN DATA
     const [plan, setPlan] = useState({
         info: {
             title: "My Travel Plan Title",
@@ -114,13 +93,11 @@ function TravelPlan() {
         }
     });
 
-    const [bucketlistCards, setBucketlistCards] = useState(bucketlistPlaceholderCards);
-    const [activeBucketlistCard, setActiveBucketlistCard] = useState(null);
-
     function updatePlan(data) {
         setPlan(data);
     }
 
+    // ACTIVITY CREATION & EDITION FUNCTIONS
     function updateDays(data) {
         setDays([...days, {
             title: data,
@@ -130,8 +107,20 @@ function TravelPlan() {
         }]);
     }
 
+    function handleArchive(id) {
+        const clickedCard = activities.find((card) => card.id === id);
+        clickedCard.isArchived ?
+            setAppStatus({ open: true, severity: "success", message: "Activity moved to Bucket list" })
+            : setAppStatus({ open: true, severity: "success", message: "Activity archived" });
 
-    // ACTIVITY CREATION/EDITION FUNCTIONS
+        setActivities(activities.map((card) => {
+            if (card.id === id) {
+                return { ...card, isArchived: !card.isArchived };
+            }
+            return card;
+        }));
+    }
+
     function handleCreationStart() {
         setIsOpenCreationDialog(true);
         setEditingValue({
@@ -191,16 +180,18 @@ function TravelPlan() {
         setEditingValue({ ...editingValue, image: file });
     }
 
-    function handleEditStart(data) {
+    function handleEditStart(id) {
+        const clickedCard = activities.find((card) => card.id === id);
+
         setEditingValue({
-            category: standalonePlaceholderCardData.category,
-            title: standalonePlaceholderCardData.title,
-            description: standalonePlaceholderCardData.description,
-            location: standalonePlaceholderCardData.location,
-            time: standalonePlaceholderCardData.timeAllocation,
-            price: standalonePlaceholderCardData.price,
-            url: standalonePlaceholderCardData.url,
-            image: standalonePlaceholderCardData.image,
+            category: clickedCard.category,
+            title: clickedCard.title,
+            description: clickedCard.description,
+            location: clickedCard.location,
+            time: clickedCard.timeAllocation,
+            price: clickedCard.price,
+            url: clickedCard.url,
+            image: clickedCard.image,
         });
         setIsOpenCreationDialog(true);
     }
@@ -222,13 +213,18 @@ function TravelPlan() {
         setCollapsedAccordions([]);
     }
 
-    // DRAG AND DROP FUNCTIONS
+    // DRAG AND DROP FUNCTIONS 
     function handleDragStart(event) {
         console.log("Drag start");
         console.log("Active:", event.active);
 
-        if (event.active.data.current.type === "activity") {
-            setActiveBucketlistCard(event.active.data.current?.day);
+        if (event.active.data.current?.type === "activity") {
+            setActiveCard(event.active.data.current?.day);
+            return;
+        }
+
+        if (event.active.data.current?.type === "day") {
+            setActiveDay(event.active.data.current?.day);
             return;
         }
     }
@@ -240,16 +236,28 @@ function TravelPlan() {
         console.log("Active:", active);
         console.log("Over:", over);
 
-        if (active.id !== over.id) {
-            setBucketlistCards((card) => {
+        if ((active.data.current.type === 'activity') && (active.id !== over.id)) {
+            setActivities((card) => {
                 const activeIndex = card.findIndex((c) => c.id === active.id);
                 const overIndex = card.findIndex((c) => c.id === over.id);
 
                 return arrayMove(card, activeIndex, overIndex);
             });
+
+            setActiveCard(null);
         }
 
-        console.log("Bucketlist cards:", bucketlistCards);
+        if ((active.data.current.type === 'day') && (active.id !== over.id)) {
+            setDays((day) => {
+                const activeIndex = day.findIndex((d) => d.id === active.id);
+                const overIndex = day.findIndex((d) => d.id === over.id);
+
+                return arrayMove(day, activeIndex, overIndex);
+            });
+
+            setActiveDay(null);
+        }
+
         return;
     }
 
@@ -271,9 +279,34 @@ function TravelPlan() {
                     onDragEnd={handleDragEnd}
                 >
 
-                    {/* MAP */}
+                    {/* GLOBAL MAP */}
                     <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='map'>
-                        <PlanMap markers={markers} />
+                        {markers.length > 0 && <PlanMap markers={markers} />}
+                        {markers.length === 0 &&
+                            <Box
+                                display="flex" alignItems="center"
+                                p={3}
+                                sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
+                            >
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
+                                    <Typography variant="h2" color="black">
+                                        Map
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" justifyContent="center" gap={1} flexGrow={1}>
+                                    <Typography variant="normal" color='grey' textAlign="center">
+                                        No data available
+                                    </Typography>
+                                    <Tooltip
+                                        title="Add location data to your activities and you will see them appear on the map"
+                                        placement='bottom' arrow
+                                    >
+                                        <InfoOutlinedIcon sx={{ color: 'grey' }} />
+                                    </Tooltip>
+                                </Box>
+                            </Box>
+                        }
                     </Container>
 
                     {/* BUCKET LIST */}
@@ -298,13 +331,20 @@ function TravelPlan() {
                             </Box>
 
                             {/* ACTIVITY CARDS */}
-                            <SortableContext items={bucketlistCards}>
+                            <SortableContext items={activities}>
                                 <Grid container spacing={2}>
-                                    {bucketlistCards.map((card, index) => (
-                                        <Grid item size={{ sm: 12, md: 6 }}>
-                                            <ActivityCard key={index} data={card} edit={handleEditStart} />
-                                        </Grid>
-                                    ))}
+                                    {activities
+                                        .filter((card) => !card.isArchived && !card.dayId)
+                                        .map((card, index) => (
+                                            <Grid item key={index} size={{ sm: 12, md: 6 }}>
+                                                <ActivityCard
+                                                    data={card}
+                                                    edit={() => handleEditStart(card.id)}
+                                                    archive={() => handleArchive(card.id)}
+                                                />
+                                            </Grid>
+                                        ))
+                                    }
                                 </Grid>
                             </SortableContext>
 
@@ -328,7 +368,7 @@ function TravelPlan() {
                                         </Typography>
                                     </Box>
 
-                                    <Box sx={{ mr: 0.75 }}>
+                                    <Box sx={{ mr: 0.75, display: "flex" }}>
                                         <Tooltip title="Expand all" placement='top' arrow>
                                             <IconButton onClick={expandAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === 0 ? "none" : "auto" }}>
                                                 <UnfoldMoreDoubleIcon sx={{
@@ -360,11 +400,19 @@ function TravelPlan() {
                                                 index={dayIndex}
                                                 expanded={!collapsedAccordions.includes(dayIndex)}
                                                 onChange={() => updateAccordions(dayIndex)}
+                                                activities={activities.filter((card) => card.dayId === day.id)}
                                             >
-
-                                                {placeholderCardData.map((card, cardIndex) => (
-                                                    <ActivityCard key={cardIndex} data={card} edit={handleEditStart} />
-                                                ))}
+                                                {activities
+                                                    .filter((card) => !card.isArchived && card.dayId === day.id)
+                                                    .map((card, cardIndex) => (
+                                                        <ActivityCard
+                                                            key={cardIndex}
+                                                            data={card}
+                                                            edit={() => handleEditStart(card.id)}
+                                                            archive={() => handleArchive(card.id)}
+                                                        />
+                                                    ))
+                                                }
 
                                             </DayCard>
                                         </Box>
@@ -384,6 +432,7 @@ function TravelPlan() {
                             p={3}
                             sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
                         >
+                            {/* HEADER */}
                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <HorizontalRuleIcon sx={{ color: theme.palette.primary.main, fontSize: "3rem" }} />
@@ -393,18 +442,34 @@ function TravelPlan() {
                                 </Box>
                             </Box>
 
-                            <Grid container spacing={2}>
-                                <Grid item size={{ xs: 12, md: 6 }}>
-                                    <ActivityCard data={standalonePlaceholderCardData} edit={handleEditStart} />
+                            {/* ACTIVITY CARDS */}
+                            <SortableContext items={activities}>
+                                <Grid container spacing={2}>
+                                    {activities
+                                        .filter((card) => card.isArchived)
+                                        .map((card, index) => (
+                                            <Grid item key={index} size={{ sm: 12, md: 6 }}>
+                                                <ActivityCard
+                                                    data={card}
+                                                    edit={() => handleEditStart(card.id)}
+                                                    archive={() => handleArchive(card.id)}
+                                                />
+                                            </Grid>
+                                        ))
+                                    }
                                 </Grid>
-                            </Grid>
+                            </SortableContext>
                         </Box>
                     </Container>
 
                     {/* DRAG OVERLAY */}
                     <DragOverlay>
-                        {activeBucketlistCard && (
-                            <ActivityCard data={activeBucketlistCard} edit={handleEditStart} />
+                        {activeCard && (
+                            <ActivityCard data={activeCard} edit={() => { }} archive={() => { }} />
+                        )}
+
+                        {activeDay && (
+                            <DayCard day={activeDay} index={0} expanded={false} onChange={() => { }} />
                         )}
                     </DragOverlay>
 
