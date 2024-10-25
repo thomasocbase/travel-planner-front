@@ -28,9 +28,8 @@ export default function ActivityCard(props) {
             type: 'activity',
             day: { ...props.data },
         },
-        animateLayoutChanges: () => false
+        animateLayoutChanges: () => false,
     });
-
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -62,6 +61,7 @@ export default function ActivityCard(props) {
     return (
         <Card
             ref={setNodeRef}
+            elevation={0}
             sx={{
                 backgroundColor: "white",
                 borderRadius: '10px',
@@ -71,6 +71,7 @@ export default function ActivityCard(props) {
             }}
         >
             <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs: "column-reverse", sm: "row" } }}>
+
                 <CardMedia
                     component="img"
                     src={props.data.image} alt={props.data.title}
@@ -81,6 +82,7 @@ export default function ActivityCard(props) {
 
                     }}
                 />
+
                 <Box display="flex" flexDirection="column" gap={1}>
 
                     <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -109,7 +111,9 @@ export default function ActivityCard(props) {
                         </Link>
                     </Box>
                 </Box>
+
             </CardContent>
+
             <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
 
                 <Box display={"flex"} gap={2}>
@@ -131,6 +135,7 @@ export default function ActivityCard(props) {
                         {props.data.isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
                     </IconButton>
                 </Box>
+
             </CardActions>
         </Card>
     )

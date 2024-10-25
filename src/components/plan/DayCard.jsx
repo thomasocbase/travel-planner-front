@@ -26,7 +26,7 @@ export default function DayCard(props) {
             type: 'day',
             day: { ...props.day },
         },
-        animateLayoutChanges: () => false
+        animateLayoutChanges: () => true
     });
 
     const style = {
@@ -38,12 +38,12 @@ export default function DayCard(props) {
     const [markers, setMarkers] = useState([]);
 
     useEffect(() => {
-        const newMarkers = props.activities.map(activity => {
+        const newMarkers = props.activities?.map(activity => {
             const [lat, lng] = activity.location.split(',').map(coord => parseFloat(coord));
             return { position: [lat, lng], popup: activity.title };
         });
         setMarkers(newMarkers);
-    }, [props.day]);
+    }, [props.activities]);
 
     // EDIT TITLE
     const [editingValue, setEditingValue] = useState();
@@ -85,6 +85,7 @@ export default function DayCard(props) {
     function handleDeleteDay() {
         // Todo: Send delete request to backend
 
+        props.deleteDay();
         setIsOpenSupprDialog(false);
         setAppStatus({ open: true, severity: "success", message: "Day deleted" });
     }
@@ -141,6 +142,9 @@ export default function DayCard(props) {
                         <Grid item size={{ sm: 12, md: 8 }}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                                 {props.children}
+                                <Box width="100%" height={50} sx={{ border: "2px dotted grey", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                    <Typography variant='normal' color="grey">Drop a card to add an activity to this day</Typography>
+                                </Box>
                             </Box>
                         </Grid>
 
@@ -148,7 +152,7 @@ export default function DayCard(props) {
                         <Grid item size={{ xs: 12, sm: 12, md: 4 }} component="aside" mb={2}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 
-                                {markers.length > 0 &&
+                                {markers && markers.length > 0 &&
                                     <PlanMap
                                         markers={markers}
                                         attribution={false}

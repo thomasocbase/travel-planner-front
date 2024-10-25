@@ -17,10 +17,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { MuiFileInput } from 'mui-file-input';
 import StatusContext from '../components/status/StatusContext';
 import PlanMap from '../components/plan/PlanMap';
-import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
 
 const placeholderDays = [
     {
@@ -53,8 +52,6 @@ function TravelPlan() {
 
     const [activities, setActivities] = useState(placeholderCardData);
 
-    const [activeCard, setActiveCard] = useState(null);
-
     const [days, setDays] = useState(placeholderDays);
     const [activeDay, setActiveDay] = useState(null);
 
@@ -63,10 +60,13 @@ function TravelPlan() {
 
     useEffect(() => {
         const newMarkers =
-            activities.map((activity) => {
-                const [lat, lng] = activity.location.split(',').map(coord => parseFloat(coord));
-                return { position: [lat, lng], popup: activity.title };
-            });
+            activities
+                .filter((activity) => !activity.isArchived)
+                .filter((activity) => activity.location)
+                .map((activity) => {
+                    const [lat, lng] = activity.location.split(',').map(coord => parseFloat(coord));
+                    return { position: [lat, lng], popup: activity.title };
+                });
         setMarkers(newMarkers);
     }, [activities]);
 
@@ -105,6 +105,10 @@ function TravelPlan() {
             duration: "8h",
             budget: "50",
         }]);
+    }
+
+    function deleteDay(id) {
+        setDays(days.filter((day) => day.id !== id));
     }
 
     function handleArchive(id) {
@@ -213,11 +217,10 @@ function TravelPlan() {
         setCollapsedAccordions([]);
     }
 
-    // DRAG AND DROP FUNCTIONS 
-    function handleDragStart(event) {
-        console.log("Drag start");
-        console.log("Active:", event.active);
+    // DRAG AND DROP 
+    const [activeCard, setActiveCard] = useState(null);
 
+    function handleDragStart(event) {
         if (event.active.data.current?.type === "activity") {
             setActiveCard(event.active.data.current?.day);
             return;
@@ -240,6 +243,18 @@ function TravelPlan() {
             setActivities((card) => {
                 const activeIndex = card.findIndex((c) => c.id === active.id);
                 const overIndex = card.findIndex((c) => c.id === over.id);
+
+                // Move in/out of archive
+                if (card[activeIndex].isArchived != card[overIndex].isArchived) {
+                    card[activeIndex].isArchived = !card[activeIndex].isArchived;
+                }
+
+                // Move in/out of day
+                if (card[overIndex].dayId) {
+                    card[activeIndex].dayId = card[overIndex].dayId;
+                } else {
+                    card[activeIndex].dayId = null;
+                }
 
                 return arrayMove(card, activeIndex, overIndex);
             });
@@ -331,7 +346,7 @@ function TravelPlan() {
                             </Box>
 
                             {/* ACTIVITY CARDS */}
-                            <SortableContext items={activities}>
+                            <SortableContext items={activities.filter((card) => !card.isArchived && !card.dayId)}>
                                 <Grid container spacing={2}>
                                     {activities
                                         .filter((card) => !card.isArchived && !card.dayId)
@@ -401,18 +416,21 @@ function TravelPlan() {
                                                 expanded={!collapsedAccordions.includes(dayIndex)}
                                                 onChange={() => updateAccordions(dayIndex)}
                                                 activities={activities.filter((card) => card.dayId === day.id)}
+                                                deleteDay={() => deleteDay(day.id)}
                                             >
-                                                {activities
-                                                    .filter((card) => !card.isArchived && card.dayId === day.id)
-                                                    .map((card, cardIndex) => (
-                                                        <ActivityCard
-                                                            key={cardIndex}
-                                                            data={card}
-                                                            edit={() => handleEditStart(card.id)}
-                                                            archive={() => handleArchive(card.id)}
-                                                        />
-                                                    ))
-                                                }
+                                                <SortableContext items={activities.filter((card) => !card.isArchived && card.dayId === day.id)}>
+                                                    {activities
+                                                        .filter((card) => !card.isArchived && card.dayId === day.id)
+                                                        .map((card, cardIndex) => (
+                                                            <ActivityCard
+                                                                key={cardIndex}
+                                                                data={card}
+                                                                edit={() => handleEditStart(card.id)}
+                                                                archive={() => handleArchive(card.id)}
+                                                            />
+                                                        ))
+                                                    }
+                                                </SortableContext>
 
                                             </DayCard>
                                         </Box>
@@ -443,7 +461,7 @@ function TravelPlan() {
                             </Box>
 
                             {/* ACTIVITY CARDS */}
-                            <SortableContext items={activities}>
+                            <SortableContext items={activities.filter((card) => card.isArchived)}>
                                 <Grid container spacing={2}>
                                     {activities
                                         .filter((card) => card.isArchived)

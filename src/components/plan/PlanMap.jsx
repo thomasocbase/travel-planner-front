@@ -1,5 +1,5 @@
 import { Box, useTheme } from '@mui/material'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet'
 import { Icon } from 'leaflet'
 
@@ -12,21 +12,31 @@ const icon = new Icon({
 export default function PlanMap(props) {
     const theme = useTheme()
 
-    // Calculating center of map based on average of all markers
-    const total = props.markers.reduce((acc, marker) => {
-        return [acc[0] + marker.position[0], acc[1] + marker.position[1]];
-    }, [0, 0]);
-    
-    const center = [total[0] / props.markers.length, total[1] / props.markers.length];
+    const [center, setCenter] = React.useState([0, 0])
+    const [zoom, setZoom] = React.useState(10)
 
-    // Adapting zoom level based on distance between markers
-    const difference = props.markers.reduce((acc, marker) => {
-        const distance = Math.sqrt((marker.position[0] - center[0]) ** 2 + (marker.position[1] - center[1]) ** 2);
-        return Math.max(acc, distance);
-    }, 0);
-    
-    // Zoom level is inversely proportional to distance
-    const zoom = Math.round(14 - Math.log2(difference / 0.01));
+    useEffect(() => {
+        // Calculating center of map based on average of all markers
+        const total = props.markers.reduce((acc, marker) => {
+            return [acc[0] + marker.position[0], acc[1] + marker.position[1]];
+        }, [0, 0]);
+
+        const center = [total[0] / props.markers.length, total[1] / props.markers.length];
+        setCenter([...center]);
+        console.log("Center", center)
+
+        // Adapting zoom level based on distance between markers
+        const difference = props.markers.reduce((acc, marker) => {
+            const distance = Math.sqrt((marker.position[0] - center[0]) ** 2 + (marker.position[1] - center[1]) ** 2);
+            return Math.max(acc, distance);
+        }, 0);
+
+        // Zoom level is inversely proportional to distance
+        const zoom = Math.round(14 - Math.log2(difference / 0.01));
+        // setZoom(zoom);
+        console.log("Zoom", zoom)
+
+    }, [props.markers])
 
     return (
         <Box
