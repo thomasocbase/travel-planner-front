@@ -244,16 +244,23 @@ function TravelPlan() {
                 const activeIndex = card.findIndex((c) => c.id === active.id);
                 const overIndex = card.findIndex((c) => c.id === over.id);
 
+                
                 // Move in/out of archive
-                if (card[activeIndex].isArchived != card[overIndex].isArchived) {
+                if (over.data.current.type === "activity" && (card[activeIndex].isArchived != card[overIndex].isArchived)) {
                     card[activeIndex].isArchived = !card[activeIndex].isArchived;
                 }
-
+                
                 // Move in/out of day
-                if (card[overIndex].dayId) {
+                if (over.data.current.type === "activity" && (card[overIndex].dayId)) {
                     card[activeIndex].dayId = card[overIndex].dayId;
                 } else {
                     card[activeIndex].dayId = null;
+                }
+
+                // Case where activity is dropped on a day without another activiy over it
+                if (over.data.current?.type === "day") {
+                    card[activeIndex].dayId = over.id;
+                    card[activeIndex].isArchived = false;
                 }
 
                 return arrayMove(card, activeIndex, overIndex);
