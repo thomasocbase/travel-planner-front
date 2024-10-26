@@ -158,7 +158,7 @@ function TravelPlan() {
             setCreationError("Title is too long");
             return;
         }
-        if (editingValue.description.length > 200) {
+        if (editingValue.description.length > 500) {
             setCreationError("Description is too long");
             return;
         }
@@ -526,8 +526,8 @@ function TravelPlan() {
                         />
                         <TextField
                             multiline
-                            rows={4}
-                            label="Description (max 200 characters)"
+                            rows={6}
+                            label="Description (max 500 characters)"
                             value={editingValue?.description || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, description: e.target.value })}
                         />

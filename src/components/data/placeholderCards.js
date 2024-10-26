@@ -6,7 +6,7 @@ export const placeholderCardData = [
     {
         id: generateId(),
         title: "Airbnb Trocadéro",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
         image: "https://picsum.photos/id/42/800/600",
         url: "https://www.airbnb.com/rooms/12345678",
         price: 100,

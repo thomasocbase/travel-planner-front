@@ -1,4 +1,4 @@
-import { Box, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Link, Skeleton, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Link, Skeleton, Tooltip, Typography, useTheme } from "@mui/material";
 import React from "react";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -18,10 +18,13 @@ import matchCategoryColor from '../../helpers/activityColor';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Collapse from '@mui/material/Collapse';
 
 export default function ActivityCard(props) {
     const theme = useTheme();
 
+    // DRAG AND DROP
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
         id: props.data.id,
         data: {
@@ -36,6 +39,14 @@ export default function ActivityCard(props) {
         transition,
     };
 
+    // EXPAND CARD
+    const [expanded, setExpanded] = React.useState(false);
+
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
+    // MATCH CATEGORY ICON
     function matchCategoryIcon(category) {
         const fontSize = "1.2rem";
         switch (category) {
@@ -72,6 +83,7 @@ export default function ActivityCard(props) {
         >
             <CardContent sx={{ display: "flex", gap: 2, flexDirection: { xs: "column-reverse", sm: "row" } }}>
 
+                {/* IMAGE */}
                 <CardMedia
                     component="img"
                     src={props.data.image} alt={props.data.title}
@@ -102,7 +114,9 @@ export default function ActivityCard(props) {
 
                     <Typography variant="h5" mt={2}>{props.data.title}</Typography>
 
-                    <Typography variant="smaller">{props.data.description}</Typography>
+                    <Typography variant="smaller">
+                        {props.data.description.length > 150 ? (props.data.description.slice(0, 150) + "...") : props.data.description}
+                    </Typography>
 
                     <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
                         <LinkIcon />
@@ -116,6 +130,7 @@ export default function ActivityCard(props) {
 
             <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
 
+                {/* STATS */}
                 <Box display={"flex"} gap={2}>
                     <Box display="flex" alignItems={"center"} gap={1}>
                         <AccessTimeIcon />
@@ -127,16 +142,37 @@ export default function ActivityCard(props) {
                     </Box>
                 </Box>
 
+                {/* EXPAND BUTTON */}
+                <IconButton onClick={() => setExpanded(!expanded)}>
+                    <Tooltip title={expanded ? "Hide full description" : "Show full description"} arrow>
+                        <ExpandMoreIcon sx={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "200ms ease-in-out" }} />
+                    </Tooltip>
+                </IconButton>
+
+                {/* ACTIONS */}
                 <Box display="flex" sx={{ color: "black" }}>
                     <IconButton color='inherit' onClick={props.edit}>
-                        <EditIcon />
+                        <Tooltip title="Edit activity" arrow>
+                            <EditIcon />
+                        </Tooltip>
                     </IconButton>
                     <IconButton color='inherit' onClick={props.archive}>
-                        {props.data.isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
+                        <Tooltip title={props.data.isArchived ? "Unarchive activity" : "Archive activity"} arrow>
+                            {props.data.isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
+                        </Tooltip>
                     </IconButton>
                 </Box>
 
             </CardActions>
+
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <CardContent>
+                    <Typography variant="normal">
+                        {props.data.description}
+                    </Typography>
+                </CardContent>
+            </Collapse>
+
         </Card>
     )
 }

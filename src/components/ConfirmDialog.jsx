@@ -10,7 +10,7 @@ function ConfirmDialog(props) {
             open={props.open}
             onClose={props.onClose}
             scroll="paper"
-            maxWidth="xs"
+            maxWidth="sm"
             fullWidth
             sx={{ zIndex: 9999 }}
         >
