@@ -5,10 +5,13 @@ import Grid from '@mui/material/Grid2';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import XIcon from '@mui/icons-material/X';
-import HeaderImage from '../assets/pexels-sanmane-1365425.jpg';
+import HeaderImage from '../assets/images/pexels-sanmane-1365425.jpg';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import ClassIcon from '@mui/icons-material/Class';
 import ExploreIcon from '@mui/icons-material/Explore';
+import SubImageOrganize from '../assets/images/pexels-brunogobofoto-3854816.jpg';
+import SubImagePlan from '../assets/images/pexels-jessbaileydesign-1558691.jpg';
+import SubImageExplore from '../assets/images/pexels-mike-468229-1181809.jpg';
 
 function Homepage() {
     const theme = useTheme();
@@ -17,17 +20,20 @@ function Homepage() {
         {
             icon: TravelExploreIcon,
             title: 'Organize',
-            description: 'Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.'
+            description: 'Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.',
+            image: SubImageOrganize
         },
         {
             icon: ClassIcon,
             title: 'Plan',
-            description: 'Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.'
+            description: 'Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.',
+            image: SubImagePlan
         },
         {
             icon: ExploreIcon,
             title: 'Explore',
-            description: 'Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.'
+            description: 'Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.',
+            image: SubImageExplore
         },
     ];
 
@@ -81,7 +87,7 @@ function Homepage() {
             <Container component="section" maxWidth='lg' sx={{ mb: 2, px: 2 }}>
                 <Box
                     sx={{
-                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.5) 0%,rgba(34,34,34,0.5) 100%), url('${HeaderImage}')`,
+                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,0.5) 100%), url('${HeaderImage}')`,
                         backgroundSize: 'cover',
                         backgroundRepeat: 'no-repeat',
                         backgroundAttachment: 'fixed',
@@ -115,6 +121,7 @@ function Homepage() {
                             display="flex" flexDirection="column" justifyContent="center" gap={2}
                             sx={{
                                 backgroundColor: theme.palette.primary.dark,
+                                backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,0.9) 100%), url('${section.image}')`,
                                 borderRadius: "15px",
                                 aspectRatio: 1,
                                 p: 5,
@@ -167,7 +174,7 @@ function Homepage() {
 
                 </Box>
             </Container >
-            
+
             {/* SOCIALS */}
             < Container component="section" maxWidth='lg' sx={{ mt: 2, mb: 10, px: 2 }} className="fadeIn">
                 <Box display="flex" flexDirection="column" alignItems="center" p={5}>
