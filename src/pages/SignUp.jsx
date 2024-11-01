@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Alert, Box, Button, FormControl, InputAdornment, Link, TextField, Typography, useTheme } from "@mui/material";
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import BadgeIcon from '@mui/icons-material/Badge';
 import PasswordIcon from '@mui/icons-material/Password';
+import ky from "ky";
+import StatusContext from "../components/status/StatusContext";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function SignUp() {
     const theme = useTheme();
+    const { setAppStatus } = useContext(StatusContext);
+    const navigate = useNavigate();
 
     const [userInfo, setUserInfo] = useState({
         email: '',
@@ -46,14 +51,31 @@ function SignUp() {
         return isValid;
     }
 
-    function handleRegister() {
+    async function handleRegister() {
         validateData();
 
         if (validateData()) {
-            console.log(userInfo);
-            // TODO: Send register request
+            try {
+                const response = await ky.post('http://localhost:3000/api' + '/auth/register', {
+                    json: {
+                        email: userInfo.email,
+                        username: userInfo.username,
+                        password: userInfo.password
+                    }
+                }).json();
+            
+                setAppStatus({ open: true, severity: "success", message: response.message });
+                setError('');
+                navigate('/login');
+
+            } catch (error) {
+                console.log(error);
+                setAppStatus({ open: true, severity: "error", message: error.message });
+            }
         }
     }
+
+    console.log(import.meta.env.VITE_API_URI)
 
     return (
         <>
