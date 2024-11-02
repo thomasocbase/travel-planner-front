@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
 import { Routes, Route } from 'react-router-dom'
@@ -11,6 +11,8 @@ import TravelPlan from './pages/TravelPlan'
 import StatusContext from './components/status/StatusContext'
 import StatusSnackbar from './components/status/StatusSnackbar'
 
+import AuthContext from './components/auth/AuthContext'
+
 import './App.css'
 
 function App() {
@@ -21,20 +23,46 @@ function App() {
     message: '',
   })
 
+  // USER STATUS MANAGEMENT (logged in or not)
+  const initialUserState = localStorage.getItem('user')
+    ? JSON.parse(localStorage.getItem('user'))
+    : { username: "", isLoggedIn: false };
+
+  const [user, setUser] = useState(initialUserState)
+
+  useEffect(() => {
+    if (document.cookie.includes('CHECKER')) {
+      const username =
+        document.cookie
+          .split('; ')
+          .find(row => row.startsWith('CHECKER'))
+          .split('=')[1];
+
+      const userData = { username: username, isLoggedIn: true };
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData)); // Mise à jour du localStorage
+    } else {
+      setUser({ username: "", isLoggedIn: false });
+      localStorage.removeItem('user'); // Nettoyage si l'utilisateur n'est pas connecté
+    }
+  }, []);
+
   return (
     <>
-      <StatusContext.Provider value={{ appStatus, setAppStatus }}>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/plan" element={<TravelPlan />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<LogIn />} />
-        </Routes>
-        {/* {window.location.pathname !== '/signup' && <Footer /> } */}
-        <Footer />
-        <StatusSnackbar />
-      </StatusContext.Provider>
+      <AuthContext.Provider value={{ user, setUser }}>
+        <StatusContext.Provider value={{ appStatus, setAppStatus }}>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/plan" element={<TravelPlan />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<LogIn />} />
+          </Routes>
+          {/* {window.location.pathname !== '/signup' && <Footer /> } */}
+          <Footer />
+          <StatusSnackbar />
+        </StatusContext.Provider>
+      </AuthContext.Provider>
     </>
   )
 }

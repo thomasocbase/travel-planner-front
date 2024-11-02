@@ -90,7 +90,6 @@ function Homepage() {
                         backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,0.5) 100%), url('${HeaderImage}')`,
                         backgroundSize: 'cover',
                         backgroundRepeat: 'no-repeat',
-                        backgroundAttachment: 'fixed',
                         backgroundPosition: 'center center',
                         overflow: 'hidden',
                         backgroundColor: theme.palette.primary.dark,
