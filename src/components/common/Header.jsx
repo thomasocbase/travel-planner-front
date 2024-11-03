@@ -62,7 +62,8 @@ function Header() {
                 <Container component="header" maxWidth="lg" sx={{
                     position: "relative",
                     borderRadius: '10px',
-                    height: '60px'
+                    height: '60px',
+                    mb: 2,
                 }}>
                     <Box component="a" href="/"
                         sx={{
@@ -91,7 +92,7 @@ function Header() {
     }
 
     return (
-        <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white', mb: 3 }}>
+        <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white', mb: 2 }}>
             <Container maxWidth="lg">
                 <Toolbar disableGutters sx={{ position: 'relative' }}>
 
@@ -168,6 +169,7 @@ function Header() {
 
                     {/* USER SETTINGS */}
                     <Box sx={{ flexGrow: 0 }}>
+                        <Typography variant='normal' mr={1}>{user && user.username}</Typography>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/2.jpg" />
@@ -196,7 +198,12 @@ function Header() {
                                     </Link>
                                 </MenuItem>
                             ))}
-                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                            <MenuItem>
+                                <Link href="/admin" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                                    Admin
+                                </Link>
+                            </MenuItem>
+                            <MenuItem onClick={handleLogout} sx={{ '&:hover': { color: theme.palette.primary.secondary } }}>Logout</MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>

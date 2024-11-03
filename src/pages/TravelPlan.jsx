@@ -20,6 +20,7 @@ import PlanMap from '../components/plan/PlanMap';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import AuthContext from '../components/auth/AuthContext';
 
 const placeholderDays = [
     {
@@ -44,6 +45,7 @@ const categories = ["Hike", "Tour", "Accommodation", "Meal", "Shopping", "Transp
 function TravelPlan() {
     const theme = useTheme();
     const { setAppStatus } = useContext(StatusContext);
+    const { user } = useContext(AuthContext);
 
     const [editingValue, setEditingValue] = useState();
     const [isOpenCreationDialog, setIsOpenCreationDialog] = useState(false);
@@ -283,6 +285,16 @@ function TravelPlan() {
         return;
     }
 
+    if (!user.isLoggedIn) {
+        return (
+            <Box
+                minHeight="90svh"
+                display="flex" justifyContent="center" alignItems="center"
+            >
+                <Typography variant="h2" color="black">Please log in to view this page</Typography>
+            </Box>
+        );
+    }
 
     return (
         <Box component="main" mb={10}>

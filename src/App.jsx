@@ -7,6 +7,8 @@ import SignUp from './pages/SignUp'
 import LogIn from './pages/LogIn'
 import Homepage from './pages/Homepage'
 import TravelPlan from './pages/TravelPlan'
+import AdminUsers from './pages/admin/AdminUsers'
+import RestrictedRoute from './components/common/RestrictedRoute'
 
 import StatusContext from './components/status/StatusContext'
 import StatusSnackbar from './components/status/StatusSnackbar'
@@ -40,10 +42,10 @@ function App() {
 
       const userData = { username: username, isLoggedIn: true };
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData)); // Mise à jour du localStorage
+      localStorage.setItem('user', JSON.stringify(userData));
     } else {
       setUser({ username: "", isLoggedIn: false });
-      localStorage.removeItem('user'); // Nettoyage si l'utilisateur n'est pas connecté
+      localStorage.removeItem('user');
     }
   }, []);
 
@@ -54,9 +56,18 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Homepage />} />
-            <Route path="/plan" element={<TravelPlan />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<LogIn />} />
+            <Route path="/plan" element={
+              <RestrictedRoute user={user}>
+                <TravelPlan />
+              </RestrictedRoute>}
+            />
+            <Route path="/admin" element={
+              <RestrictedRoute user={user} admin>
+                <AdminUsers />
+              </RestrictedRoute>}
+            />
           </Routes>
           {/* {window.location.pathname !== '/signup' && <Footer /> } */}
           <Footer />

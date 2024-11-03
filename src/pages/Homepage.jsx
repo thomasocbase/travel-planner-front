@@ -10,7 +10,7 @@ import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import ClassIcon from '@mui/icons-material/Class';
 import ExploreIcon from '@mui/icons-material/Explore';
 import SubImageOrganize from '../assets/images/pexels-brunogobofoto-3854816.jpg';
-import SubImagePlan from '../assets/images/pexels-jessbaileydesign-1558691.jpg';
+import SubImagePlan from '../assets/images/pexels-leeloothefirst-5386754.jpg';
 import SubImageExplore from '../assets/images/pexels-mike-468229-1181809.jpg';
 
 function Homepage() {
@@ -52,17 +52,17 @@ function Homepage() {
         {
             name: '@KevinFam',
             review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.',
-            img: 'https://via.placeholder.com/100'
+            img: 'https://i.pravatar.cc/150?img=3'
         },
         {
             name: '@Lory64',
             review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.',
-            img: 'https://via.placeholder.com/100'
+            img: 'https://i.pravatar.cc/150?img=1'
         },
         {
             name: '@MalcomX',
             review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.',
-            img: 'https://via.placeholder.com/100'
+            img: 'https://i.pravatar.cc/150?img=7'
         },
     ];
 
@@ -87,7 +87,7 @@ function Homepage() {
             <Container component="section" maxWidth='lg' sx={{ mb: 2, px: 2 }}>
                 <Box
                     sx={{
-                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,0.5) 100%), url('${HeaderImage}')`,
+                        backgroundImage: `linear-gradient(to top, rgba(242,195,4,0.3) 0%,rgba(34,34,34,0.9) 100%), url('${HeaderImage}')`,
                         backgroundSize: 'cover',
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center center',

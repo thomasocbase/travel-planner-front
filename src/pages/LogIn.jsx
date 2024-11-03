@@ -62,6 +62,12 @@ function Login() {
         }
     }
 
+    function handleEnterPress(e) {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    }
+
     return (
         <>
             <Box
@@ -117,6 +123,7 @@ function Login() {
                                 },
                             }}
                             onChange={(e) => setUserInfo({ ...userInfo, password: e.target.value })}
+                            onKeyPress={handleEnterPress}
                             sx={{ color: "white", "& .MuiFormLabel-root": { color: "white" } }}
                         />
                     </FormControl>

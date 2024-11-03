@@ -52,7 +52,25 @@ function Footer() {
     ];
 
     return (
-        <Container component="footer" maxWidth="false" sx={{ backgroundColor: "black", minHeight: "100px", pt: 5, pb: 2, mt: 4 }}>
+        <Container component="footer" maxWidth="false"
+            sx={{ 
+                position: "relative",
+                backgroundColor: "black", 
+                minHeight: "100px", 
+                pt: 10, pb: 2, mt: 20,
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: "-130px",
+                    left: 0,
+                    width: '100%',
+                    height: '200px',
+                    background: 'white',
+                    clipPath: 'ellipse(55% 40% at 50% 50%)',
+                    zIndex: 2,
+                }
+            }}
+        >
             <Container>
                 <Grid container columnSpacing={10} rowSpacing={5} justifyContent="space-between">
                     <Grid item>
