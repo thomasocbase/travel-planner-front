@@ -21,12 +21,12 @@ export default function DayCard(props) {
 
     // DnD
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
-        id: props.day.id,
+        id: props.day._id,
         data: {
             type: 'day',
             day: { ...props.day },
         },
-        animateLayoutChanges: () => true
+        animateLayoutChanges: () => false
     });
 
     const style = {
@@ -67,8 +67,7 @@ export default function DayCard(props) {
             return;
         }
 
-        // Todo: Send new title to backend
-
+        props.updateTitle(props.day._id, editingValue);
         setAppStatus({ open: true, severity: "success", message: "Day title updated" });
         setError(null);
         setIsEditingTitle(false);
@@ -83,12 +82,23 @@ export default function DayCard(props) {
 
     // DELETE DAY
     function handleDeleteDay() {
-        // Todo: Send delete request to backend
-
         props.deleteDay();
         setIsOpenSupprDialog(false);
         setAppStatus({ open: true, severity: "success", message: "Day deleted" });
     }
+
+    // STATS CALCULATION
+
+    const [stats, setStats] = useState({ duration: 0, budget: 0 });
+
+    useEffect(() => {
+        let newStats = { duration: 0, budget: 0 };
+        props.activities?.forEach(activity => {
+            newStats.duration += activity.timeAllocation;
+            newStats.budget += activity.price;
+        });
+        setStats(newStats);
+    }, [props.activities]);
 
     return (
         <>
@@ -123,11 +133,11 @@ export default function DayCard(props) {
                         <Box display="flex" gap={2}>
                             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                                 <AccessTimeIcon />
-                                <Typography variant="body2">{props.day.duration}</Typography>
+                                <Typography variant="body2">{stats.duration}</Typography>
                             </Box>
                             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                                 <CreditCardIcon />
-                                <Typography variant="body2">{props.day.budget}€</Typography>
+                                <Typography variant="body2">{stats.budget}€</Typography>
                             </Box>
                         </Box>
 

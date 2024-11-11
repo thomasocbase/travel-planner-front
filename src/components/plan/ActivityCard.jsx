@@ -26,7 +26,7 @@ export default function ActivityCard(props) {
 
     // DRAG AND DROP
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
-        id: props.data.id,
+        id: props.data._id,
         data: {
             type: 'activity',
             day: { ...props.data },
@@ -76,7 +76,7 @@ export default function ActivityCard(props) {
             sx={{
                 backgroundColor: "white",
                 borderRadius: '10px',
-                borderLeft: `6px solid ${matchCategoryColor(props.data.category)}`,
+                borderLeft: `6px solid ${matchCategoryColor(props.data.activityType.name)}`,
                 filter: `${isDragging ? 'opacity(20%)' : ''} ${props.data.isArchived ? 'grayscale(1)' : ''}`,
                 ...style
             }}
@@ -98,12 +98,12 @@ export default function ActivityCard(props) {
                 <Box display="flex" flexDirection="column" gap={1}>
 
                     <Box display="flex" alignItems="center" justifyContent="space-between">
-                        <Chip icon={matchCategoryIcon(props.data.category)} label={props.data.category}
+                        <Chip icon={matchCategoryIcon(props.data.activityType.name)} label={props.data.activityType.name}
                             sx={{
                                 alignSelf: "start",
                                 fontFamily: "Poppins, sans-serif", fontSize: "0.75rem", fontWeight: 600,
                                 px: 1,
-                                color: matchCategoryColor(props.data.category)
+                                color: matchCategoryColor(props.data.activityType.name)
                             }}
                         />
                         <DragIndicatorIcon

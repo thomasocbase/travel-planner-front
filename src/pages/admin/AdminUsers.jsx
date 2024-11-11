@@ -9,8 +9,7 @@ export default function AdminUsers() {
 
     useEffect(() => {
         fetchUsers();
-    }
-        , []);
+    }, []);
 
     async function fetchUsers() {
         try {

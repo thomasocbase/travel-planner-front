@@ -23,7 +23,7 @@ export default function PlanMap(props) {
 
         const center = [total[0] / props.markers.length, total[1] / props.markers.length];
         setCenter([...center]);
-        console.log("Center", center)
+        // console.log("Center", center)
 
         // Adapting zoom level based on distance between markers
         const difference = props.markers.reduce((acc, marker) => {
@@ -34,7 +34,7 @@ export default function PlanMap(props) {
         // Zoom level is inversely proportional to distance
         const zoom = Math.round(14 - Math.log2(difference / 0.01));
         // setZoom(zoom);
-        console.log("Zoom", zoom)
+        // console.log("Zoom", zoom)
 
     }, [props.markers])
 

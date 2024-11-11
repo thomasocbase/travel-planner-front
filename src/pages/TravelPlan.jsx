@@ -21,25 +21,20 @@ import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import AuthContext from '../components/auth/AuthContext';
+import ky from 'ky';
 
-const placeholderDays = [
-    {
-        id: 1,
-        title: "This is the title of the day",
-        order: 1,
-        duration: "8h",
-        budget: "50",
-    },
-    {
-        id: 2,
-        title: "And here is another",
-        order: 2,
-        duration: "6h",
-        budget: "30",
-    },
-]
+const planId = "672d03bf69f596a99ba87288";
+const userId = "67250f1fa0b9612c6157079a";
 
-const categories = ["Hike", "Tour", "Accommodation", "Meal", "Shopping", "Transport", "Note"];
+const placeholderStats = {
+    totalBudget: 0,
+    totalDays: 5,
+    totalActivities: 0,
+    totalDrivingDistance: 0,
+    totalHikingDistance: 0,
+    likes: 5,
+    saves: 2,
+}
 
 
 function TravelPlan() {
@@ -52,10 +47,63 @@ function TravelPlan() {
     const [creationError, setCreationError] = useState(null);
     const [collapsedAccordions, setCollapsedAccordions] = useState([]);
 
-    const [activities, setActivities] = useState(placeholderCardData);
+    const [activities, setActivities] = useState([]);
 
-    const [days, setDays] = useState(placeholderDays);
+    const [days, setDays] = useState([]);
     const [activeDay, setActiveDay] = useState(null);
+
+    // ACTIVITIES FETCH
+    async function fetchActivities() {
+        try {
+            const response = await ky.get('http://localhost:3000/api' + '/plan/' + planId + "/activities", {
+                credentials: 'include'
+            }).json();
+
+            setActivities(response);
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: "Couldn't retrieve activities: " + error.message });
+        }
+    }
+
+    useEffect(() => {
+        fetchActivities();
+    }, []);
+
+    // DAYS FETCH
+    async function fetchDays() {
+        try {
+            const response = await ky.get('http://localhost:3000/api' + '/plan/' + planId + "/days", {
+                credentials: 'include'
+            }).json();
+
+            setDays(response);
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: "Couldn't retrieve days: " + error.message });
+        }
+    }
+
+    useEffect(() => {
+        fetchDays();
+    }, []);
+
+    // CATEGORIES FETCH
+    const [categories, setCategories] = useState([]);
+
+    async function fetchCategories() {
+        try {
+            const response = await ky.get('http://localhost:3000/api' + '/activityType', {
+                credentials: 'include'
+            }).json();
+
+            setCategories(response);
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: "Couldn't retrieve categories: " + error.message });
+        }
+    }
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     // MAP MARKERS
     const [markers, setMarkers] = useState([]);
@@ -72,49 +120,87 @@ function TravelPlan() {
         setMarkers(newMarkers);
     }, [activities]);
 
-    console.log("Markers:", markers);
+    // PLAN FETCH
+    const [plan, setPlan] = useState({});
 
-    // PLACEHOLDER PLAN DATA
-    const [plan, setPlan] = useState({
-        info: {
-            title: "My Travel Plan Title",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
-            image: "https://picsum.photos/id/177/800/600",
-        },
-        status: "Private",
-        calculatedStats: {
-            totalBudget: 0,
-            totalDays: 0,
-            totalActivities: 0,
-            totalDrivingDistance: 0,
-            totalHikingDistance: 0,
-        },
-        socialStats: {
-            likes: 5,
-            saves: 2,
+    useEffect(() => {
+        fetchInitialPlan();
+    }, []);
+
+    async function fetchInitialPlan() {
+        try {
+            const response = await ky.get('http://localhost:3000/api/plan/initial', {
+                credentials: 'include'
+            }).json();
+
+            setPlan(response);
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
         }
-    });
+    }
 
     function updatePlan(data) {
         setPlan(data);
     }
 
+    // DAY CREATION & EDITION FUNCTIONS
+    async function addDay(data) {
+        try {
+            const response = await ky.post('http://localhost:3000/api' + '/day', {
+                json: {
+                    planId: planId,
+                    userId: userId,
+                    title: data,
+                    order: days.length + 1,
+                    duration: "8h",
+                    budget: "50",
+                },
+                credentials: 'include'
+            }).json();
+
+            setDays([...days, response.day]);
+            setAppStatus({ open: true, severity: 'success', message: 'Day added' });
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
+    
+    async function updateTitle(id, newTitle) {
+        try {
+            const response = await ky.put("http://localhost:3000/api" + "/day/title/" + id, {
+                json: { title: newTitle },
+                credentials: "include"
+            }).json();
+
+            setDays(days.map((day) => {
+                if (day._id === id) {
+                    return { ...day, title: newTitle };
+                }
+                return day;
+            }));
+            setAppStatus({ open: true, severity: "success", message: "Day title updated" });
+        } catch (error) {
+            setAppStatus({ open: true, severity: "error", message: "An error occurred" + error });
+        }
+    }
+
+    async function deleteDay(id) {
+        try {
+            const response = await ky.delete('http://localhost:3000/api' + '/day/' + id, {
+                credentials: 'include'
+            }).json();
+            setAppStatus({ open: true, severity: 'success', message: 'Day deleted' });
+            setDays(days.filter((day) => day._id !== id));
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
+
     // ACTIVITY CREATION & EDITION FUNCTIONS
-    function updateDays(data) {
-        setDays([...days, {
-            title: data,
-            order: placeholderDays.length + 1,
-            duration: "8h",
-            budget: "50",
-        }]);
-    }
+    async function handleArchive(id) {
+        // Todo: Send archive status to backend
 
-    function deleteDay(id) {
-        setDays(days.filter((day) => day.id !== id));
-    }
-
-    function handleArchive(id) {
-        const clickedCard = activities.find((card) => card.id === id);
+        const clickedCard = activities.find((card) => card._id === id);
         clickedCard.isArchived ?
             setAppStatus({ open: true, severity: "success", message: "Activity moved to Bucket list" })
             : setAppStatus({ open: true, severity: "success", message: "Activity archived" });
@@ -212,7 +298,7 @@ function TravelPlan() {
     }
 
     function collapseAllAccordions() {
-        setCollapsedAccordions([...Array(placeholderDays.length).keys()]);
+        setCollapsedAccordions([...Array(days.length).keys()]);
     }
 
     function expandAllAccordions() {
@@ -221,6 +307,18 @@ function TravelPlan() {
 
     // DRAG AND DROP 
     const [activeCard, setActiveCard] = useState(null);
+
+    async function updateOrder(id, newOrder) {
+        try {
+            const response = await ky.put('http://localhost:3000/api' + '/day/order/' + id, {
+                json: { order: newOrder },
+                credentials: 'include'
+            }).json();
+            setAppStatus({ open: true, severity: 'success', message: 'Order updated' });
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
 
     function handleDragStart(event) {
         if (event.active.data.current?.type === "activity") {
@@ -243,15 +341,15 @@ function TravelPlan() {
 
         if ((active.data.current.type === 'activity') && (active.id !== over.id)) {
             setActivities((card) => {
-                const activeIndex = card.findIndex((c) => c.id === active.id);
-                const overIndex = card.findIndex((c) => c.id === over.id);
+                const activeIndex = card.findIndex((c) => c._id === active.id);
+                const overIndex = card.findIndex((c) => c._id === over.id);
 
-                
+
                 // Move in/out of archive
                 if (over.data.current.type === "activity" && (card[activeIndex].isArchived != card[overIndex].isArchived)) {
                     card[activeIndex].isArchived = !card[activeIndex].isArchived;
                 }
-                
+
                 // Move in/out of day
                 if (over.data.current.type === "activity" && (card[overIndex].dayId)) {
                     card[activeIndex].dayId = card[overIndex].dayId;
@@ -261,7 +359,7 @@ function TravelPlan() {
 
                 // Case where activity is dropped on a day without another activiy over it
                 if (over.data.current?.type === "day") {
-                    card[activeIndex].dayId = over.id;
+                    card[activeIndex].dayId = over._id;
                     card[activeIndex].isArchived = false;
                 }
 
@@ -272,11 +370,28 @@ function TravelPlan() {
         }
 
         if ((active.data.current.type === 'day') && (active.id !== over.id)) {
-            setDays((day) => {
-                const activeIndex = day.findIndex((d) => d.id === active.id);
-                const overIndex = day.findIndex((d) => d.id === over.id);
+            if (!over || over.data.current.type === "activity") {
+                return;
+            }
 
-                return arrayMove(day, activeIndex, overIndex);
+            setDays((day) => {
+                const activeDay = day.find((d) => d._id === active.id);
+                const overDay = day.find((d) => d._id === over.id);
+
+                [activeDay.order, overDay.order] = [overDay.order, activeDay.order];
+
+                updateOrder(active.id, activeDay.order);
+                updateOrder(over.id, overDay.order);
+
+                return day.map((d) => {
+                    if (d.id === active.id) {
+                        return overDay;
+                    }
+                    if (d.id === over.id) {
+                        return activeDay;
+                    }
+                    return d;
+                });
             });
 
             setActiveDay(null);
@@ -284,6 +399,7 @@ function TravelPlan() {
 
         return;
     }
+
 
     if (!user.isLoggedIn) {
         return (
@@ -301,7 +417,7 @@ function TravelPlan() {
 
             {/* OVERVIEW SECTION */}
             <Container component="section" maxWidth="lg" sx={{ mb: 6, px: 2 }}>
-                <PlanOverview plan={plan} updatePlan={updatePlan} />
+                <PlanOverview plan={plan} updatePlan={updatePlan} stats={placeholderStats} />
             </Container>
 
             {/* ANCHOR NAV */}
@@ -413,9 +529,9 @@ function TravelPlan() {
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Collapse all" placement='top' arrow>
-                                            <IconButton onClick={collapseAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === placeholderDays.length ? "none" : "auto" }}>
+                                            <IconButton onClick={collapseAllAccordions} sx={{ pointerEvents: collapsedAccordions.length === days.length ? "none" : "auto" }}>
                                                 <UnfoldLessDoubleIcon sx={{
-                                                    color: collapsedAccordions.length === placeholderDays.length ? theme.palette.primary.medium : "white",
+                                                    color: collapsedAccordions.length === days.length ? theme.palette.primary.medium : "white",
                                                     fontSize: "2rem",
                                                     '&:hover': { color: theme.palette.primary.secondary }
                                                 }} />
@@ -426,39 +542,42 @@ function TravelPlan() {
                                 </Box>
 
                                 {/* DAYS */}
-                                <SortableContext items={days}>
-                                    {days.map((day, dayIndex) => (
-                                        <Box key={dayIndex}>
-                                            <DayCard
-                                                day={day}
-                                                index={dayIndex}
-                                                expanded={!collapsedAccordions.includes(dayIndex)}
-                                                onChange={() => updateAccordions(dayIndex)}
-                                                activities={activities.filter((card) => card.dayId === day.id)}
-                                                deleteDay={() => deleteDay(day.id)}
-                                            >
-                                                <SortableContext items={activities.filter((card) => !card.isArchived && card.dayId === day.id)}>
-                                                    {activities
-                                                        .filter((card) => !card.isArchived && card.dayId === day.id)
-                                                        .map((card, cardIndex) => (
-                                                            <ActivityCard
-                                                                key={cardIndex}
-                                                                data={card}
-                                                                edit={() => handleEditStart(card.id)}
-                                                                archive={() => handleArchive(card.id)}
-                                                            />
-                                                        ))
-                                                    }
-                                                </SortableContext>
+                                <SortableContext items={days.map((item) => item._id)}>
+                                    {days
+                                        .sort((a, b) => a.order - b.order)
+                                        .map((day, dayIndex) => (
+                                            <Box key={dayIndex}>
+                                                <DayCard
+                                                    day={day}
+                                                    index={dayIndex}
+                                                    expanded={!collapsedAccordions.includes(dayIndex)}
+                                                    onChange={() => updateAccordions(dayIndex)}
+                                                    activities={activities.filter((card) => card.dayId === day._id)}
+                                                    updateTitle={updateTitle}
+                                                    deleteDay={() => deleteDay(day._id)}
+                                                >
+                                                    <SortableContext items={activities.filter((card) => !card.isArchived && card.dayId === day._id)}>
+                                                        {activities
+                                                            .filter((card) => !card.isArchived && card.dayId === day._id)
+                                                            .map((card, cardIndex) => (
+                                                                <ActivityCard
+                                                                    key={cardIndex}
+                                                                    data={card}
+                                                                    edit={() => handleEditStart(card._id)}
+                                                                    archive={() => handleArchive(card._id)}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </SortableContext>
 
-                                            </DayCard>
-                                        </Box>
-                                    ))}
+                                                </DayCard>
+                                            </Box>
+                                        ))}
                                 </SortableContext>
                             </Box>
 
                             <Box mt={2}>
-                                <AddDayButton updateDays={updateDays} />
+                                <AddDayButton addDay={addDay} />
                             </Box>
                         </Box>
                     </Container>
@@ -488,8 +607,8 @@ function TravelPlan() {
                                             <Grid item key={index} size={{ sm: 12, md: 6 }}>
                                                 <ActivityCard
                                                     data={card}
-                                                    edit={() => handleEditStart(card.id)}
-                                                    archive={() => handleArchive(card.id)}
+                                                    edit={() => handleEditStart(card._id)}
+                                                    archive={() => handleArchive(card._id)}
                                                 />
                                             </Grid>
                                         ))
@@ -526,6 +645,7 @@ function TravelPlan() {
                         <Autocomplete
                             disablePortal
                             options={categories}
+                            getOptionLabel={(option) => option.name}
                             value={editingValue?.category || ''}
                             onChange={(e, value) => setEditingValue({ ...editingValue, category: value })}
                             renderInput={(params) => <TextField {...params} label="Category" required />}

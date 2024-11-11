@@ -29,7 +29,7 @@ export default function PlanOverview(props) {
 
     function handleEditTitleStart() {
         setIsEditingTitle(true);
-        setEditingValue(props.plan.info.title);
+        setEditingValue(props.plan.title);
     }
 
     function handleEditTitleSubmit() {
@@ -46,10 +46,7 @@ export default function PlanOverview(props) {
         setIsEditingTitle(false);
         props.updatePlan({
             ...props.plan,
-            info: {
-                ...props.plan.info,
-                title: editingValue
-            }
+            title: editingValue
         });
         // TODO: Send new title to backend
     }
@@ -69,7 +66,7 @@ export default function PlanOverview(props) {
         setIsOpenStatusDialog(false);
         props.updatePlan({
             ...props.plan,
-            status: editingValue
+            visibilityState: editingValue
         });
         // TODO: Send new status to backend
     }
@@ -87,7 +84,7 @@ export default function PlanOverview(props) {
         // TODO: Upload file to backend
         console.log("File uploaded", file);
         setAppStatus({ open: true, severity: "success", message: "Image uploaded" });
-        
+
         setFileError(null);
         setFile(null);
     }
@@ -120,7 +117,7 @@ export default function PlanOverview(props) {
                             </>
                         ) : (
                             <>
-                                <Typography variant="h1">{props.plan.info.title}</Typography>
+                                <Typography variant="h1">{props.plan.title}</Typography>
                                 <IconButton onClick={handleEditTitleStart}>
                                     <EditIcon />
                                 </IconButton>
@@ -132,39 +129,39 @@ export default function PlanOverview(props) {
                     <Box display="flex" alignItems="center" gap={0.5}>
                         <Typography color='grey'>{props.plan.status}</Typography>
                         <IconButton onClick={handleEditStatusStart}>
-                            {props.plan.status === "Private" && <VisibilityOffIcon />}
-                            {props.plan.status === "Restricted" && <LockPersonIcon />}
-                            {props.plan.status === "Public" && <PublicIcon />}
+                            {props.plan.visibilityState === "private" && <VisibilityOffIcon />}
+                            {props.plan.visibilityState === "unlisted" && <LockPersonIcon />}
+                            {props.plan.visibilityState === "public" && <PublicIcon />}
                         </IconButton>
                     </Box>
                 </Box>
 
                 {error && <Alert severity="warning">{error}</Alert>}
 
-                <Typography variant="normal">{props.plan.info.description}</Typography>
+                <Typography variant="normal">{props.plan.description}</Typography>
 
                 {/* QUICK STATS */}
                 <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}>
                     <Typography variant="h3" color="white">Quick Stats</Typography>
                     <Box display="flex" flexWrap="wrap" gap={3} mt={2}>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.plan.calculatedStats.totalDays}</Typography>
-                            <Typography fontSize="1.2rem" color='white'>{props.plan.calculatedStats > 1 ? "days" : "day"}</Typography>
+                            <Typography fontSize="2rem" color='white'>{props.stats.totalDays}</Typography>
+                            <Typography fontSize="1.2rem" color='white'>{props.stats.totalDays > 1 ? "days" : "day"}</Typography>
                         </Box>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.plan.calculatedStats.totalActivities}</Typography>
-                            <Typography fontSize="1.2rem" color='white'>{props.plan.calculatedStats.totalActivities > 1 ? "activities" : "activity"}</Typography>
+                            <Typography fontSize="2rem" color='white'>{props.stats.totalActivities}</Typography>
+                            <Typography fontSize="1.2rem" color='white'>{props.stats.totalActivities > 1 ? "activities" : "activity"}</Typography>
                         </Box>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.plan.calculatedStats.totalBudget}</Typography>
+                            <Typography fontSize="2rem" color='white'>{props.stats.totalBudget}</Typography>
                             <Typography fontSize="1.2rem" color='white'>budget</Typography>
                         </Box>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.plan.calculatedStats.totalDrivingDistance}</Typography>
+                            <Typography fontSize="2rem" color='white'>{props.stats.totalDrivingDistance}</Typography>
                             <Typography fontSize="1.2rem" color='white'>driving</Typography>
                         </Box>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.plan.calculatedStats.totalHikingDistance}</Typography>
+                            <Typography fontSize="2rem" color='white'>{props.stats.totalHikingDistance}</Typography>
                             <Typography fontSize="1.2rem" color='white'>hiking</Typography>
                         </Box>
                     </Box>
@@ -175,16 +172,16 @@ export default function PlanOverview(props) {
                     p={1}
                     display="flex" gap={4} flexWrap={"wrap"}
                 >
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <StarsIcon sx={{ fontSize: "2rem" }}/>
+                    <Box display="flex" alignItems="center" gap={1}S>
+                        <StarsIcon sx={{ fontSize: "2rem" }} />
                         <Typography >
-                            {props.plan.socialStats.likes} {props.plan.socialStats.likes > 1 ? "likes" : "like"}
+                            {props.stats.likes} {props.stats.likes > 1 ? "likes" : "like"}
                         </Typography>
                     </Box>
                     <Box display="flex" alignItems="center" gap={1}>
-                        <ClassIcon sx={{ fontSize: "2rem" }}/>
+                        <ClassIcon sx={{ fontSize: "2rem" }} />
                         <Typography>
-                            Saved by {props.plan.socialStats.saves} {props.plan.socialStats.saves > 1 ? "members" : "member"}
+                            Saved by {props.stats.saves} {props.stats.saves > 1 ? "members" : "member"}
                         </Typography>
                     </Box>
                 </Box>
@@ -192,9 +189,9 @@ export default function PlanOverview(props) {
 
             {/* FEATURED IMAGE */}
             <Grid item size={{ xs: 12, md: 6 }}>
-                {props.plan.info.image ? (
+                {props.plan.image ? (
                     <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "10px" }}>
-                        <Box component="img" src={props.plan.info.image} alt="Travel Plan" width="100%" />
+                        <Box component="img" src={props.plan.image} alt="Travel Plan" width="100%" />
                     </Box>
                 ) : (
                     <Box sx={{
@@ -242,10 +239,10 @@ export default function PlanOverview(props) {
                     >
                         <FormControlLabel value="Private" control={<Radio />} label="Private" />
                         <Typography variant="notice" sx={{ mb: 2 }} >Only you can see this plan</Typography>
-                        <FormControlLabel value="Restricted" control={<Radio />} label="Restricted" />
-                        <Typography variant="notice" sx={{ mb: 2 }}>Only your friends can see this plan</Typography>
+                        <FormControlLabel value="Unlisted" control={<Radio />} label="Unlisted" />
+                        <Typography variant="notice" sx={{ mb: 2 }}>This plan is accessible by anyone via direct link</Typography>
                         <FormControlLabel value="Public" control={<Radio />} label="Public" />
-                        <Typography variant="notice" sx={{ mb: 2 }}>Everyone can see this plan (pending moderation)</Typography>
+                        <Typography variant="notice" sx={{ mb: 2 }}>This plan is listed in the public directory (pending moderation)</Typography>
                     </RadioGroup>
                 </FormControl>
             </ConfirmDialog>

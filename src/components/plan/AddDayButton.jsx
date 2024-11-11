@@ -30,15 +30,10 @@ export default function AddDayButton(props) {
         }
 
         // Add the day
-        props.updateDays(addValue);
+        props.addDay(addValue);
         setIsAdding(false);
         setAddValue("");
         setError(null);
-        setAppStatus({
-            open: true,
-            severity: "success",
-            message: "Day added successfully"
-        });
     }
 
     return (
