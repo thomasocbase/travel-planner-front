@@ -122,6 +122,7 @@ function TravelPlan() {
 
     // PLAN FETCH
     const [plan, setPlan] = useState({});
+    const [isPlanLoading, setIsPlanLoading] = useState(true);
 
     useEffect(() => {
         fetchInitialPlan();
@@ -134,6 +135,7 @@ function TravelPlan() {
             }).json();
 
             setPlan(response);
+            setIsPlanLoading(false);
         } catch (error) {
             setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
         }
@@ -423,6 +425,17 @@ function TravelPlan() {
                 display="flex" justifyContent="center" alignItems="center"
             >
                 <Typography variant="h2" color="black">Please log in to view this page</Typography>
+            </Box>
+        );
+    }
+
+    if (isPlanLoading) {
+        return (
+            <Box
+                minHeight="90svh"
+                display="flex" justifyContent="center" alignItems="center"
+            >
+                <Typography variant="h2" color="black">Loading...</Typography>
             </Box>
         );
     }
