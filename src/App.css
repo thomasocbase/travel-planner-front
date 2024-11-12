@@ -39,7 +39,7 @@ html {
 .fadeIn {
   animation: fadeIn linear forwards;
   animation-timeline: view();
-  animation-range: cover 0% cover 10%;
+  animation-range: cover 0% cover 15%;
 }
 
 @keyframes addShadow {

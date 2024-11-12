@@ -164,7 +164,7 @@ function TravelPlan() {
             setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
         }
     }
-    
+
     async function updateTitle(id, newTitle) {
         try {
             const response = await ky.put("http://localhost:3000/api" + "/day/title/" + id, {
@@ -200,6 +200,7 @@ function TravelPlan() {
     async function handleArchive(id) {
         // Todo: Send archive status to backend
 
+        // Update local state
         const clickedCard = activities.find((card) => card._id === id);
         clickedCard.isArchived ?
             setAppStatus({ open: true, severity: "success", message: "Activity moved to Bucket list" })
@@ -217,13 +218,16 @@ function TravelPlan() {
         setIsOpenCreationDialog(true);
         setEditingValue({
             title: "",
-            category: null,
-            location: "",
-            time: "",
+            description: "",
+            activityType: { name: "" },
+            timeAllocation: "",
             price: "",
             url: "",
-            description: "",
+            location: "",
             image: null,
+            isArchived: false,
+            order: activities.filter((card) => !card.isArchived && !card.dayId).length + 1,
+            planId: planId,
         });
     }
 
@@ -233,8 +237,28 @@ function TravelPlan() {
         setEditingValue(null);
     }
 
+    async function addActivity(data) {
+        try {
+            const response = await ky.post('http://localhost:3000/api' + '/activity', {
+                json: { ...data },
+                credentials: 'include'
+            }).json();
+
+            console.log("Response", response);
+            setActivities([...activities, response.activity]);
+            setIsOpenCreationDialog(false);
+            setEditingValue({
+                activityType: { name: "" },
+            });
+            setCreationError(null);
+            setAppStatus({ open: true, severity: 'success', message: 'Activity added' });
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
+
     function handleCreationDialogConfirm() {
-        if (!editingValue.category || editingValue.category === "") {
+        if (!editingValue.activityType || editingValue.activityType === "") {
             setCreationError("Please select a category for the activity");
             return;
         }
@@ -250,7 +274,7 @@ function TravelPlan() {
             setCreationError("Description is too long");
             return;
         }
-        if (editingValue.duration && isNaN(editingValue.duration)) {
+        if (editingValue.timeAllocation && isNaN(editingValue.timeAllocation)) {
             setCreationError("Duration must be a number, in hours");
             return;
         }
@@ -263,9 +287,8 @@ function TravelPlan() {
             return;
         }
 
-        setIsOpenCreationDialog(false);
-        // Todo: Send new activity data to backend
-        setEditingValue(null);
+        addActivity(editingValue);
+
     }
 
     function handleFileChange(file) {
@@ -273,18 +296,10 @@ function TravelPlan() {
     }
 
     function handleEditStart(id) {
-        const clickedCard = activities.find((card) => card.id === id);
+        const clickedCard = activities.find((card) => card._id === id);
+        console.log("Clicked card", clickedCard);
 
-        setEditingValue({
-            category: clickedCard.category,
-            title: clickedCard.title,
-            description: clickedCard.description,
-            location: clickedCard.location,
-            time: clickedCard.timeAllocation,
-            price: clickedCard.price,
-            url: clickedCard.url,
-            image: clickedCard.image,
-        });
+        setEditingValue({ ...clickedCard });
         setIsOpenCreationDialog(true);
     }
 
@@ -481,10 +496,14 @@ function TravelPlan() {
                             </Box>
 
                             {/* ACTIVITY CARDS */}
-                            <SortableContext items={activities.filter((card) => !card.isArchived && !card.dayId)}>
+                            <SortableContext items={activities
+                                .filter((card) => !card.isArchived && !card.dayId)
+                                .map((item) => item._id)
+                            }>
                                 <Grid container spacing={2}>
                                     {activities
                                         .filter((card) => !card.isArchived && !card.dayId)
+                                        .sort((a, b) => a.order - b.order)
                                         .map((card, index) => (
                                             <Grid item key={index} size={{ sm: 12, md: 6 }}>
                                                 <ActivityCard
@@ -552,11 +571,16 @@ function TravelPlan() {
                                                     index={dayIndex}
                                                     expanded={!collapsedAccordions.includes(dayIndex)}
                                                     onChange={() => updateAccordions(dayIndex)}
-                                                    activities={activities.filter((card) => card.dayId === day._id)}
+                                                    activities={activities
+                                                        .filter((card) => card.dayId === day._id)
+                                                        .sort((a, b) => a.order - b.order)}
                                                     updateTitle={updateTitle}
                                                     deleteDay={() => deleteDay(day._id)}
                                                 >
-                                                    <SortableContext items={activities.filter((card) => !card.isArchived && card.dayId === day._id)}>
+                                                    <SortableContext items={activities
+                                                        .filter((card) => !card.isArchived && card.dayId === day._id)
+                                                        .map((item) => item._id)
+                                                    }>
                                                         {activities
                                                             .filter((card) => !card.isArchived && card.dayId === day._id)
                                                             .map((card, cardIndex) => (
@@ -599,10 +623,14 @@ function TravelPlan() {
                             </Box>
 
                             {/* ACTIVITY CARDS */}
-                            <SortableContext items={activities.filter((card) => card.isArchived)}>
+                            <SortableContext items={activities
+                                .filter((card) => card.isArchived)
+                                .map((item) => item._id)
+                            }>
                                 <Grid container spacing={2}>
                                     {activities
                                         .filter((card) => card.isArchived)
+                                        .sort((a, b) => a.order - b.order)
                                         .map((card, index) => (
                                             <Grid item key={index} size={{ sm: 12, md: 6 }}>
                                                 <ActivityCard
@@ -642,12 +670,15 @@ function TravelPlan() {
             >
                 <FormControl>
                     <Box display={'flex'} flexDirection={'column'} gap={2}>
+                        {creationError &&
+                            <Alert severity="warning">{creationError}</Alert>
+                        }
                         <Autocomplete
                             disablePortal
                             options={categories}
                             getOptionLabel={(option) => option.name}
-                            value={editingValue?.category || ''}
-                            onChange={(e, value) => setEditingValue({ ...editingValue, category: value })}
+                            value={editingValue?.activityType || ''}
+                            onChange={(e, value) => setEditingValue({ ...editingValue, activityType: value })}
                             renderInput={(params) => <TextField {...params} label="Category" required />}
                         />
                         <TextField
@@ -670,8 +701,8 @@ function TravelPlan() {
                         />
                         <TextField
                             label="Time allocation (in hours)"
-                            value={editingValue?.time || ''}
-                            onChange={(e) => setEditingValue({ ...editingValue, time: e.target.value })}
+                            value={editingValue?.timeAllocation || ''}
+                            onChange={(e) => setEditingValue({ ...editingValue, timeAllocation: e.target.value })}
                         />
                         <TextField
                             label="Price"
@@ -683,7 +714,12 @@ function TravelPlan() {
                             value={editingValue?.url || ''}
                             onChange={(e) => setEditingValue({ ...editingValue, url: e.target.value })}
                         />
-                        <MuiFileInput
+                        <TextField
+                            label="Image"
+                            value={editingValue?.image || ''}
+                            onChange={(e) => setEditingValue({ ...editingValue, image: e.target.value })}
+                        />
+                        {/* <MuiFileInput
                             label="Image"
                             placeholder="Upload an image"
                             value={editingValue?.image || ''}
@@ -694,10 +730,7 @@ function TravelPlan() {
                                 children: <CloseIcon fontSize="small" />
                             }}
                             fullWidth
-                        />
-                        {creationError &&
-                            <Alert severity="warning">{creationError}</Alert>
-                        }
+                        /> */}
                     </Box>
                 </FormControl>
             </ConfirmDialog>

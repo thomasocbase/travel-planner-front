@@ -75,15 +75,15 @@ export default function AddDayButton(props) {
                     display: "flex", flexWrap: "wrap", alignItems: "center", columnGap: 2,
                     backgroundColor: theme.palette.primary.light,
                     borderRadius: "10px",
-                    p: 3,
+                    px: 3,
                 }}>
                     <Typography variant="h4">Add a new day</Typography>
-                    <Box my={2}>
+                    <Box my={2} sx={{ display: "flex", alignItems: "center" }}>
                         <TextField
                             variant='standard'
                             value={addValue}
                             onChange={(e) => setAddValue(e.target.value)}
-                            sx={{ minWidth: "250px", mb: 2 }}
+                            sx={{ minWidth: "250px", mb: 2, mr: 2 }}
                             onKeyDown={handleEnterPress}
                         />
                         <IconButton onClick={handleAddDay}>
