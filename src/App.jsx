@@ -8,6 +8,7 @@ import LogIn from './pages/LogIn'
 import Homepage from './pages/Homepage'
 import TravelPlan from './pages/TravelPlan'
 import AdminUsers from './pages/admin/AdminUsers'
+import PlansList from './pages/PlansList'
 import RestrictedRoute from './components/common/RestrictedRoute'
 
 import StatusContext from './components/status/StatusContext'
@@ -58,7 +59,8 @@ function App() {
             <Route path="/" element={<Homepage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<LogIn />} />
-            <Route path="/plan" element={
+            <Route path="/plans-list" element={<PlansList />} />
+            <Route path="/plan/:id" element={
               <RestrictedRoute user={user}>
                 <TravelPlan />
               </RestrictedRoute>}

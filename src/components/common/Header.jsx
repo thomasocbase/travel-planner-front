@@ -15,7 +15,7 @@ function Header() {
 
     const pages = [
         { name: 'Explore', link: '/explore' },
-        { name: 'My Travels', link: '/plan' }
+        { name: 'My Travels', link: '/plans-list' }
     ];
     const settings = [
         { label: 'Profile', link: '/profile' },

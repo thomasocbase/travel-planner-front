@@ -22,8 +22,9 @@ import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import AuthContext from '../components/auth/AuthContext';
 import ky from 'ky';
+import { useParams } from 'react-router-dom';
 
-const planId = "672d03bf69f596a99ba87288";
+// const planId = "672d03bf69f596a99ba87288";
 const userId = "67250f1fa0b9612c6157079a";
 
 const placeholderStats = {
@@ -41,6 +42,7 @@ function TravelPlan() {
     const theme = useTheme();
     const { setAppStatus } = useContext(StatusContext);
     const { user } = useContext(AuthContext);
+    const { planId } = useParams();
 
     const [editingValue, setEditingValue] = useState();
     const [isOpenCreationDialog, setIsOpenCreationDialog] = useState(false);
