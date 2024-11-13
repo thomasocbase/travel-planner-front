@@ -199,21 +199,33 @@ function TravelPlan() {
     }
 
     // ACTIVITY CREATION & EDITION FUNCTIONS
-    async function handleArchive(id) {
-        // Todo: Send archive status to backend
+    async function updateActivity(id, data) {
+        try {
+            const response = await ky.put('http://localhost:3000/api' + '/activity/' + id, {
+                json: { ...data },
+                credentials: 'include'
+            }).json();
 
-        // Update local state
-        const clickedCard = activities.find((card) => card._id === id);
-        clickedCard.isArchived ?
-            setAppStatus({ open: true, severity: "success", message: "Activity moved to Bucket list" })
-            : setAppStatus({ open: true, severity: "success", message: "Activity archived" });
+            fetchActivities();
+            setAppStatus({ open: true, severity: 'success', message: 'Activity updated' });
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: "Couldn't update: " + error.message });
+        }
+    }
 
-        setActivities(activities.map((card) => {
-            if (card.id === id) {
-                return { ...card, isArchived: !card.isArchived };
-            }
-            return card;
-        }));
+    function handleArchive(id) {
+        const activity = activities.find((card) => card._id === id);
+        activity.isArchived ? activity.isArchived = false : activity.isArchived = true;
+
+        updateActivity(id, { ...activity });
+    }
+
+    function handleUpdateOrder(id, newOrder, newDayId) {
+        const activity = activities.find((card) => card._id === id);
+        activity.order = newOrder;
+        activity.dayId = newDayId;
+
+        updateActivity(id, { ...activity });
     }
 
     function handleCreationStart() {
@@ -299,10 +311,21 @@ function TravelPlan() {
 
     function handleEditStart(id) {
         const clickedCard = activities.find((card) => card._id === id);
-        console.log("Clicked card", clickedCard);
 
         setEditingValue({ ...clickedCard });
         setIsOpenCreationDialog(true);
+    }
+
+    async function handleDelete(id) {
+        try {
+            const response = await ky.delete('http://localhost:3000/api' + '/activity/' + id, {
+                credentials: 'include'
+            }).json();
+            setAppStatus({ open: true, severity: 'success', message: 'Activity deleted' });
+            setActivities(activities.filter((card) => card._id !== id));
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: "Couldn't delete activity: " + error.message });
+        }
     }
 
     // ACCORDION FUNCTIONS
@@ -356,7 +379,12 @@ function TravelPlan() {
         console.log("Active:", active);
         console.log("Over:", over);
 
-        if ((active.data.current.type === 'activity') && (active.id !== over.id)) {
+        if (!over || active.id === over.id) {
+            return;
+        }
+
+        if (active.data.current.type === 'activity') {
+
             setActivities((card) => {
                 const activeIndex = card.findIndex((c) => c._id === active.id);
                 const overIndex = card.findIndex((c) => c._id === over.id);
@@ -383,11 +411,37 @@ function TravelPlan() {
                 return arrayMove(card, activeIndex, overIndex);
             });
 
+            // setActivities((card) => {
+            //     const activeCard = card.find((c) => c._id === active.id);
+            //     const overCard = card.find((c) => c._id === over.id);
+
+            //     // Move in/out of archive
+            //     if (over.data.current.type === "activity" && (activeCard.isArchived != overCard.isArchived)) {
+            //         activeCard.isArchived = !activeCard.isArchived;
+            //         updateActivity(activeCard._id, { ...activeCard });
+            //     }
+
+            //     // Move in/out of day
+            //     if (over.data.current.type === "activity" && overCard.dayId && overCard.dayId !== "") {
+            //         activeCard.dayId = overCard.dayId;
+            //         updateActivity(activeCard._id, { ...activeCard });
+            //     }
+
+            //     // Case where activity is dropped on a day without another activiy over it
+            //     if (over.data.current?.type === "day") {
+            //         activeCard.dayId = over.id;
+            //         activeCard.isArchived = false;
+            //         updateActivity(activeCard._id, { ...activeCard });
+            //     }
+                
+            //     return arrayMove(card, card.indexOf(activeCard), card.indexOf(overCard));
+            // });
+
             setActiveCard(null);
         }
 
-        if ((active.data.current.type === 'day') && (active.id !== over.id)) {
-            if (!over || over.data.current.type === "activity") {
+        if (active.data.current.type === 'day') {
+            if (over.data.current.type === "activity") {
                 return;
             }
 
@@ -523,6 +577,7 @@ function TravelPlan() {
                                                     data={card}
                                                     edit={() => handleEditStart(card.id)}
                                                     archive={() => handleArchive(card.id)}
+                                                    delete={() => handleDelete(card._id)}
                                                 />
                                             </Grid>
                                         ))
@@ -602,6 +657,7 @@ function TravelPlan() {
                                                                     data={card}
                                                                     edit={() => handleEditStart(card._id)}
                                                                     archive={() => handleArchive(card._id)}
+                                                                    delete={() => handleDelete(card._id)}
                                                                 />
                                                             ))
                                                         }
@@ -650,6 +706,7 @@ function TravelPlan() {
                                                     data={card}
                                                     edit={() => handleEditStart(card._id)}
                                                     archive={() => handleArchive(card._id)}
+                                                    delete={() => handleDelete(card._id)}
                                                 />
                                             </Grid>
                                         ))
@@ -662,11 +719,24 @@ function TravelPlan() {
                     {/* DRAG OVERLAY */}
                     <DragOverlay>
                         {activeCard && (
-                            <ActivityCard data={activeCard} edit={() => { }} archive={() => { }} />
+                            <ActivityCard
+                                data={activeCard}
+                                edit={() => { }}
+                                archive={() => { }}
+                                delete={() => { }}
+                            />
                         )}
 
                         {activeDay && (
-                            <DayCard day={activeDay} index={0} expanded={false} onChange={() => { }} />
+                            <DayCard
+                                day={activeDay}
+                                index={0}
+                                expanded={false}
+                                onChange={() => { }}
+                                activities={activities}
+                                updateTitle={() => { }}
+                                deleteDay={() => { }}
+                            />
                         )}
                     </DragOverlay>
 

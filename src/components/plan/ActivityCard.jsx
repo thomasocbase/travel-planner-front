@@ -1,4 +1,4 @@
-import { Box, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Link, Skeleton, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardActions, CardContent, CardMedia, Chip, Icon, IconButton, Link, Skeleton, Tooltip, Typography, useTheme } from "@mui/material";
 import React from "react";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -20,6 +20,7 @@ import { CSS } from '@dnd-kit/utilities';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function ActivityCard(props) {
     const theme = useTheme();
@@ -161,6 +162,13 @@ export default function ActivityCard(props) {
                             {props.data.isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
                         </Tooltip>
                     </IconButton>
+                    {props.data.isArchived && (
+                        <IconButton color='inherit' onClick={props.delete}>
+                            <Tooltip title="Delete activity" arrow>
+                                <DeleteIcon />
+                            </Tooltip>
+                        </IconButton>
+                    )}
                 </Box>
 
             </CardActions>
