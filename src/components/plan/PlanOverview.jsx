@@ -14,12 +14,15 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { MuiFileInput } from 'mui-file-input'
 import StatusContext from '../status/StatusContext';
 import ky from 'ky';
+import { useDebounce } from 'use-debounce';
 
 export default function PlanOverview(props) {
     const theme = useTheme();
 
     const [editingValue, setEditingValue] = useState();
+    const [debouncedEditingValue] = useDebounce(editingValue, 500);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [isEditingDescription, setIsEditingDescription] = useState(false);
     const [isOpenStatusDialog, setIsOpenStatusDialog] = useState(false);
     const [error, setError] = useState(null);
     const [file, setFile] = useState(null);
@@ -63,14 +66,31 @@ export default function PlanOverview(props) {
         setEditingValue(props.plan.planVisibilityState);
     }
 
-    
+    function handleEditDescStart() {
+        setIsEditingDescription(true);
+        setEditingValue(props.plan.description);
+    }
+
+    function handleEditDescCancel() {
+        setIsEditingDescription(false);
+        setEditingValue(null);
+    }
+
+    function handleEditDescSubmit() {
+        updatePlan({ ...props.plan, description: editingValue });
+        setIsEditingDescription(false);
+        props.updatePlanState({
+            ...props.plan,
+            description: editingValue
+        });
+    }
 
     async function updatePlan(data) {
         // TODO: TEST ENDPOINT
         try {
             const response = await ky.put('http://localhost:3000/api' + '/plan/' + props.plan._id, {
                 json: { ...data }
-            }).json(); 
+            }).json();
 
             setAppStatus({ open: true, severity: 'success', message: 'Plan updated' });
         } catch (error) {
@@ -148,7 +168,7 @@ export default function PlanOverview(props) {
                     <Box display="flex" alignItems="center" gap={0.5}>
                         <Typography color='grey'>{props.plan.planVisibilityState}</Typography>
                         <IconButton onClick={handleEditStatusStart}>
-                            
+
                             {props.plan.visibilityState === "private" && <VisibilityOffIcon />}
                             {props.plan.visibilityState === "unlisted" && <LockPersonIcon />}
                             {props.plan.visibilityState === "public" && <PublicIcon />}
@@ -158,7 +178,33 @@ export default function PlanOverview(props) {
 
                 {error && <Alert severity="warning">{error}</Alert>}
 
-                <Typography variant="normal">{props.plan.description}</Typography>
+                {/* DESCRIPTION */}
+                {isEditingDescription ? (
+                    <>
+                        <TextField
+                            multiline
+                            rows={6}
+                            label="Description (max 500 characters)"
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                        />
+                        <Box display="flex" gap={1}>
+                            <IconButton onClick={handleEditDescCancel}>
+                                <CloseIcon />
+                            </IconButton>
+                            <IconButton onClick={handleEditDescSubmit}>
+                                <DoneIcon sx={{ color: theme.palette.primary.secondary }} />
+                            </IconButton>
+                        </Box>
+                    </>
+                ) : (
+                    <Box display="flex" gap={1} alignItems="center">
+                        <Typography variant="normal">{props.plan.description}</Typography>
+                        <IconButton onClick={handleEditDescStart}>
+                            <EditIcon />
+                        </IconButton>
+                    </Box>
+                )}
 
                 {/* QUICK STATS */}
                 <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}>

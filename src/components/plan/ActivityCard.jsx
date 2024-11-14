@@ -134,7 +134,7 @@ export default function ActivityCard(props) {
             <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
 
                 {/* STATS */}
-                <Box display={"flex"} gap={2}>
+                <Box display={"flex"} gap={2} flexWrap="wrap">
                     <Box display="flex" alignItems={"center"} gap={1}>
                         <AccessTimeIcon />
                         <Typography variant='smaller'>{props.data.timeAllocation}h</Typography>
