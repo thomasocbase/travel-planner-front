@@ -23,20 +23,10 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import AuthContext from '../components/auth/AuthContext';
 import ky from 'ky';
 import { useParams } from 'react-router-dom';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import { useDebounce } from 'use-debounce';
 
-// const planId = "672d03bf69f596a99ba87288";
 const userId = "67250f1fa0b9612c6157079a";
-
-const placeholderStats = {
-    totalBudget: 0,
-    totalDays: 5,
-    totalActivities: 0,
-    totalDrivingDistance: 0,
-    totalHikingDistance: 0,
-    likes: 5,
-    saves: 2,
-}
-
 
 function TravelPlan() {
     const theme = useTheme();
@@ -45,16 +35,42 @@ function TravelPlan() {
     const { planId } = useParams();
 
     const [editingValue, setEditingValue] = useState();
+    const [debouncedEditingValue] = useDebounce(editingValue, 500);
+
     const [isOpenCreationDialog, setIsOpenCreationDialog] = useState(false);
     const [creationError, setCreationError] = useState(null);
     const [collapsedAccordions, setCollapsedAccordions] = useState([]);
 
-    const [activities, setActivities] = useState([]);
+    // PLAN FETCH
+    const [plan, setPlan] = useState({});
+    const [isPlanLoading, setIsPlanLoading] = useState(true);
 
-    const [days, setDays] = useState([]);
-    const [activeDay, setActiveDay] = useState(null);
+    useEffect(() => {
+        fetchPlan();
+    }, []);
+
+    async function fetchPlan() {
+        try {
+            const response = await ky.get('http://localhost:3000' + '/api/plan/' + planId, {
+                credentials: 'include'
+            }).json();
+
+            setPlan(response);
+            setIsPlanLoading(false);
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
+
+    console.log("Plan:", plan);
+
+    function updatePlanState(data) {
+        setPlan(data);
+    }
 
     // ACTIVITIES FETCH
+    const [activities, setActivities] = useState([]);
+
     async function fetchActivities() {
         try {
             const response = await ky.get('http://localhost:3000/api' + '/plan/' + planId + "/activities", {
@@ -72,6 +88,8 @@ function TravelPlan() {
     }, []);
 
     // DAYS FETCH
+    const [days, setDays] = useState([]);
+
     async function fetchDays() {
         try {
             const response = await ky.get('http://localhost:3000/api' + '/plan/' + planId + "/days", {
@@ -107,6 +125,24 @@ function TravelPlan() {
         fetchCategories();
     }, []);
 
+    // STATS CALCULATION
+    const [stats, setStats] = useState({
+        totalBudget: 0,
+        totalDays: 0,
+        totalActivities: 0,
+        totalDrivingDistance: 0,
+        totalHikingDistance: 0,
+        likes: 5,
+        saves: 2,
+    });
+
+    useEffect(() => {
+        const totalBudget = activities.reduce((acc, activity) => acc + parseFloat(activity.price), 0);
+        const totalDays = days.length;
+        const totalActivities = activities.length;
+        setStats({ ...stats, totalBudget, totalDays, totalActivities });
+    }, [activities, days]);
+
     // MAP MARKERS
     const [markers, setMarkers] = useState([]);
 
@@ -121,31 +157,6 @@ function TravelPlan() {
                 });
         setMarkers(newMarkers);
     }, [activities]);
-
-    // PLAN FETCH
-    const [plan, setPlan] = useState({});
-    const [isPlanLoading, setIsPlanLoading] = useState(true);
-
-    useEffect(() => {
-        fetchInitialPlan();
-    }, []);
-
-    async function fetchInitialPlan() {
-        try {
-            const response = await ky.get('http://localhost:3000/api/plan/initial', {
-                credentials: 'include'
-            }).json();
-
-            setPlan(response);
-            setIsPlanLoading(false);
-        } catch (error) {
-            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
-        }
-    }
-
-    function updatePlan(data) {
-        setPlan(data);
-    }
 
     // DAY CREATION & EDITION FUNCTIONS
     async function addDay(data) {
@@ -230,7 +241,10 @@ function TravelPlan() {
         updateActivity(id, { ...activity });
     }
 
+    const [actionType, setActionType] = useState('create');
+
     function handleCreationStart() {
+        setActionType('create');
         setIsOpenCreationDialog(true);
         setEditingValue({
             title: "",
@@ -260,13 +274,7 @@ function TravelPlan() {
                 credentials: 'include'
             }).json();
 
-            console.log("Response", response);
-            setActivities([...activities, response.activity]);
-            setIsOpenCreationDialog(false);
-            setEditingValue({
-                activityType: { name: "" },
-            });
-            setCreationError(null);
+            fetchActivities();
             setAppStatus({ open: true, severity: 'success', message: 'Activity added' });
         } catch (error) {
             setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
@@ -303,8 +311,20 @@ function TravelPlan() {
             return;
         }
 
-        addActivity(editingValue);
+        switch (actionType) {
+            case 'create':
+                addActivity(editingValue);
+                break;
+            case 'edit':
+                updateActivity(editingValue._id, editingValue);
+                break;
+            default:
+                addActivity(editingValue);
+        }
 
+        setIsOpenCreationDialog(false);
+        setEditingValue(null);
+        setCreationError(null);
     }
 
     function handleFileChange(file) {
@@ -314,9 +334,13 @@ function TravelPlan() {
     function handleEditStart(id) {
         const clickedCard = activities.find((card) => card._id === id);
 
+        setActionType('edit');
         setEditingValue({ ...clickedCard });
         setIsOpenCreationDialog(true);
     }
+
+    const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     async function handleDelete(id) {
         try {
@@ -348,6 +372,7 @@ function TravelPlan() {
     }
 
     // DRAG AND DROP 
+    const [activeDay, setActiveDay] = useState(null);
     const [activeCard, setActiveCard] = useState(null);
 
     async function updateOrder(id, newOrder) {
@@ -435,7 +460,7 @@ function TravelPlan() {
             //         activeCard.isArchived = false;
             //         updateActivity(activeCard._id, { ...activeCard });
             //     }
-                
+
             //     return arrayMove(card, card.indexOf(activeCard), card.indexOf(overCard));
             // });
 
@@ -491,6 +516,7 @@ function TravelPlan() {
                 minHeight="90svh"
                 display="flex" justifyContent="center" alignItems="center"
             >
+                <HourglassEmptyIcon sx={{ fontSize: "3rem", color: theme.palette.primary.main }} />
                 <Typography variant="h2" color="black">Loading...</Typography>
             </Box>
         );
@@ -501,7 +527,7 @@ function TravelPlan() {
 
             {/* OVERVIEW SECTION */}
             <Container component="section" maxWidth="lg" sx={{ mb: 6, px: 2 }}>
-                <PlanOverview plan={plan} updatePlan={updatePlan} stats={placeholderStats} />
+                <PlanOverview plan={plan} updatePlanState={updatePlanState} stats={stats} />
             </Container>
 
             {/* ANCHOR NAV */}
@@ -577,9 +603,12 @@ function TravelPlan() {
                                             <Grid item key={index} size={{ sm: 12, md: 6 }}>
                                                 <ActivityCard
                                                     data={card}
-                                                    edit={() => handleEditStart(card.id)}
-                                                    archive={() => handleArchive(card.id)}
-                                                    delete={() => handleDelete(card._id)}
+                                                    edit={() => handleEditStart(card._id)}
+                                                    archive={() => handleArchive(card._id)}
+                                                    delete={() => {
+                                                        setIsOpenDeleteDialog(true);
+                                                        setDeleteId(card._id);
+                                                    }}
                                                 />
                                             </Grid>
                                         ))
@@ -659,7 +688,10 @@ function TravelPlan() {
                                                                     data={card}
                                                                     edit={() => handleEditStart(card._id)}
                                                                     archive={() => handleArchive(card._id)}
-                                                                    delete={() => handleDelete(card._id)}
+                                                                    delete={() => {
+                                                                        setIsOpenDeleteDialog(true);
+                                                                        setDeleteId(card._id);
+                                                                    }}
                                                                 />
                                                             ))
                                                         }
@@ -708,7 +740,10 @@ function TravelPlan() {
                                                     data={card}
                                                     edit={() => handleEditStart(card._id)}
                                                     archive={() => handleArchive(card._id)}
-                                                    delete={() => handleDelete(card._id)}
+                                                    delete={() => {
+                                                        setIsOpenDeleteDialog(true);
+                                                        setDeleteId(card._id);
+                                                    }}
                                                 />
                                             </Grid>
                                         ))
@@ -818,6 +853,20 @@ function TravelPlan() {
                         /> */}
                     </Box>
                 </FormControl>
+            </ConfirmDialog>
+
+            {/* DELETE ACTIVITY DIALOG */}
+            <ConfirmDialog
+                open={isOpenDeleteDialog}
+                onClose={() => setIsOpenDeleteDialog(false)}
+                title="Delete activity"
+                confirm={() => {
+                    handleDelete(deleteId);
+                    setIsOpenDeleteDialog(false);
+                }}
+                cancel={() => setIsOpenDeleteDialog(false)}
+            >
+                <Typography variant="body1">Are you sure you want to delete this activity?</Typography>
             </ConfirmDialog>
         </Box>
 

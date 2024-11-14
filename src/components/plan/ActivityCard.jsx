@@ -96,7 +96,7 @@ export default function ActivityCard(props) {
                     }}
                 />
 
-                <Box display="flex" flexDirection="column" gap={1}>
+                <Box display="flex" flexDirection="column" gap={1} width="100%">
 
                     <Box display="flex" alignItems="center" justifyContent="space-between">
                         <Chip icon={matchCategoryIcon(props.data.activityType.name)} label={props.data.activityType.name}
@@ -113,18 +113,20 @@ export default function ActivityCard(props) {
                         />
                     </Box>
 
-                    <Typography variant="h5" mt={2}>{props.data.title}</Typography>
+                    <Typography variant="h5" mt={2} sx={{ wordWrap: "break-word" }}>{props.data.title}</Typography>
 
-                    <Typography variant="smaller">
+                    <Typography component="p" variant="smaller" sx={{ wordWrap: "break-word" }} width="100%">
                         {props.data.description.length > 150 ? (props.data.description.slice(0, 150) + "...") : props.data.description}
                     </Typography>
 
-                    <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
+                    {props.data.url && (
+                        <Box display="flex" alignItems="center" gap={1} color={theme.palette.primary.light}>
                         <LinkIcon />
                         <Link href={props.data.url} target="_blank" underline='hover' sx={{ color: 'inherit' }}>
                             {props.data.url.length > 25 ? (props.data.url.slice(0, 25) + "...") : props.data.url}
                         </Link>
                     </Box>
+                    )}
                 </Box>
 
             </CardContent>

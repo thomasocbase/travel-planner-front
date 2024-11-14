@@ -13,7 +13,7 @@ import PublicIcon from '@mui/icons-material/Public';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { MuiFileInput } from 'mui-file-input'
 import StatusContext from '../status/StatusContext';
-
+import ky from 'ky';
 
 export default function PlanOverview(props) {
     const theme = useTheme();
@@ -42,9 +42,10 @@ export default function PlanOverview(props) {
             return;
         }
 
+        updatePlan({ ...props.plan, title: editingValue });
         setError(null);
         setIsEditingTitle(false);
-        props.updatePlan({
+        props.updatePlanState({
             ...props.plan,
             title: editingValue
         });
@@ -59,16 +60,31 @@ export default function PlanOverview(props) {
 
     function handleEditStatusStart() {
         setIsOpenStatusDialog(true);
-        setEditingValue(props.plan.status);
+        setEditingValue(props.plan.planVisibilityState);
+    }
+
+    
+
+    async function updatePlan(data) {
+        // TODO: TEST ENDPOINT
+        try {
+            const response = await ky.put('http://localhost:3000/api' + '/plan/' + props.plan._id, {
+                json: { ...data }
+            }).json(); 
+
+            setAppStatus({ open: true, severity: 'success', message: 'Plan updated' });
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
     }
 
     function handleStatusDialogConfirm() {
+        updatePlan({ ...props.plan, planVisibilityState: editingValue });
         setIsOpenStatusDialog(false);
-        props.updatePlan({
+        props.updatePlanState({
             ...props.plan,
-            visibilityState: editingValue
+            planVisibilityState: editingValue
         });
-        // TODO: Send new status to backend
     }
 
     const handleFileChange = (newFile) => {
@@ -88,6 +104,9 @@ export default function PlanOverview(props) {
         setFileError(null);
         setFile(null);
     }
+
+    console.log("Editing value", editingValue);
+    console.log("Plan", props.plan);
 
     return (
         <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
@@ -127,8 +146,9 @@ export default function PlanOverview(props) {
 
                     {/* STATUS */}
                     <Box display="flex" alignItems="center" gap={0.5}>
-                        <Typography color='grey'>{props.plan.status}</Typography>
+                        <Typography color='grey'>{props.plan.planVisibilityState}</Typography>
                         <IconButton onClick={handleEditStatusStart}>
+                            
                             {props.plan.visibilityState === "private" && <VisibilityOffIcon />}
                             {props.plan.visibilityState === "unlisted" && <LockPersonIcon />}
                             {props.plan.visibilityState === "public" && <PublicIcon />}
@@ -143,27 +163,39 @@ export default function PlanOverview(props) {
                 {/* QUICK STATS */}
                 <Box p={3} sx={{ backgroundColor: theme.palette.primary.dark, borderRadius: '10px' }}>
                     <Typography variant="h3" color="white">Quick Stats</Typography>
-                    <Box display="flex" flexWrap="wrap" gap={3} mt={2}>
+                    <Box display="flex" alignItems="center" flexWrap="wrap" gap={2} mt={2}>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
                             <Typography fontSize="2rem" color='white'>{props.stats.totalDays}</Typography>
                             <Typography fontSize="1.2rem" color='white'>{props.stats.totalDays > 1 ? "days" : "day"}</Typography>
                         </Box>
+                        <Typography color='white'>●</Typography>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
                             <Typography fontSize="2rem" color='white'>{props.stats.totalActivities}</Typography>
                             <Typography fontSize="1.2rem" color='white'>{props.stats.totalActivities > 1 ? "activities" : "activity"}</Typography>
                         </Box>
+                        <Typography color='white'>●</Typography>
                         <Box display="flex" alignItems="baseline" gap={0.5}>
                             <Typography fontSize="2rem" color='white'>{props.stats.totalBudget}</Typography>
-                            <Typography fontSize="1.2rem" color='white'>budget</Typography>
+                            <Typography fontSize="1.2rem" color='white'>€ budget</Typography>
                         </Box>
-                        <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.stats.totalDrivingDistance}</Typography>
-                            <Typography fontSize="1.2rem" color='white'>driving</Typography>
-                        </Box>
-                        <Box display="flex" alignItems="baseline" gap={0.5}>
-                            <Typography fontSize="2rem" color='white'>{props.stats.totalHikingDistance}</Typography>
-                            <Typography fontSize="1.2rem" color='white'>hiking</Typography>
-                        </Box>
+                        {props.stats.totalDrivingDistance > 0 && (
+                            <>
+                                <Typography color='white'>●</Typography>
+                                <Box display="flex" alignItems="baseline" gap={0.5}>
+                                    <Typography fontSize="2rem" color='white'>{props.stats.totalDrivingDistance}</Typography>
+                                    <Typography fontSize="1.2rem" color='white'>km driving</Typography>
+                                </Box>
+                            </>
+                        )}
+                        {props.stats.totalHikingDistance > 0 && (
+                            <>
+                                <Typography color='white'>●</Typography>
+                                <Box display="flex" alignItems="baseline" gap={0.5}>
+                                    <Typography fontSize="2rem" color='white'>{props.stats.totalHikingDistance}</Typography>
+                                    <Typography fontSize="1.2rem" color='white'>km hiking</Typography>
+                                </Box>
+                            </>
+                        )}
                     </Box>
                 </Box>
 
@@ -172,7 +204,7 @@ export default function PlanOverview(props) {
                     p={1}
                     display="flex" gap={4} flexWrap={"wrap"}
                 >
-                    <Box display="flex" alignItems="center" gap={1}S>
+                    <Box display="flex" alignItems="center" gap={1} S>
                         <StarsIcon sx={{ fontSize: "2rem" }} />
                         <Typography >
                             {props.stats.likes} {props.stats.likes > 1 ? "likes" : "like"}
@@ -237,11 +269,11 @@ export default function PlanOverview(props) {
                         name="radio-buttons-status-group"
                         onChange={(e) => setEditingValue(e.target.value)}
                     >
-                        <FormControlLabel value="Private" control={<Radio />} label="Private" />
+                        <FormControlLabel value="67292c7e3e797b9c6565b1b2" control={<Radio />} label="Private" />
                         <Typography variant="notice" sx={{ mb: 2 }} >Only you can see this plan</Typography>
-                        <FormControlLabel value="Unlisted" control={<Radio />} label="Unlisted" />
+                        <FormControlLabel value="67292c7e3e797b9c6565b1ae" control={<Radio />} label="Unlisted" />
                         <Typography variant="notice" sx={{ mb: 2 }}>This plan is accessible by anyone via direct link</Typography>
-                        <FormControlLabel value="Public" control={<Radio />} label="Public" />
+                        <FormControlLabel value="67292c7e3e797b9c6565b1ab" control={<Radio />} label="Public" />
                         <Typography variant="notice" sx={{ mb: 2 }}>This plan is listed in the public directory (pending moderation)</Typography>
                     </RadioGroup>
                 </FormControl>

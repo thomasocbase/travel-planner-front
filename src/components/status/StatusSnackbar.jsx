@@ -19,7 +19,7 @@ export default function StatusSnackbar() {
 
     return (
         <Snackbar
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             open={appStatus.open}
             autoHideDuration={5000}
             message="Note archived"

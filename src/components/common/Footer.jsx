@@ -57,7 +57,7 @@ function Footer() {
                 position: "relative",
                 backgroundColor: "black", 
                 minHeight: "100px", 
-                pt: 10, pb: 2, mt: 20,
+                pt: 10, pb: 2, mt: 15,
                 '&::before': {
                     content: '""',
                     position: 'absolute',

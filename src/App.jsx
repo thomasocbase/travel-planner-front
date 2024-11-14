@@ -60,7 +60,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<LogIn />} />
             <Route path="/plans-list" element={<PlansList />} />
-            <Route path="/plan/:id" element={
+            <Route path="/plan/:planId" element={
               <RestrictedRoute user={user}>
                 <TravelPlan />
               </RestrictedRoute>}
