@@ -54,7 +54,7 @@ function Login() {
                 localStorage.setItem('user', JSON.stringify({ username: response.userName, isLoggedIn: true }));
                 setUser({ username: response.userName, isLoggedIn: true });
                 setAppStatus({ open: true, severity: 'success', message: 'Logged in successfully' });
-                navigate('/');
+                navigate('/plans-list');
 
             } catch (error) {
                 setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
@@ -98,11 +98,17 @@ function Login() {
                                             <AlternateEmailIcon sx={{ color: "white", mr: 1 }} />
                                         </InputAdornment>
                                     ),
-                                    sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.medium } },
+                                    sx: { 
+                                        color: "white", 
+                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.medium } },
                                 },
                             }}
                             onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
-                            sx={{ color: "white", "& .MuiFormLabel-root": { color: "white" } }}
+                            sx={{
+                                color: "white",
+                                "& .MuiFormLabel-root": { color: "white" },
+                                colorScheme: "dark",
+                            }}
                         />
                         <TextField
                             id="login-password"

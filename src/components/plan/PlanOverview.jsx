@@ -125,9 +125,6 @@ export default function PlanOverview(props) {
         setFile(null);
     }
 
-    console.log("Editing value", editingValue);
-    console.log("Plan", props.plan);
-
     return (
         <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
             <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={3}>

@@ -62,8 +62,6 @@ function TravelPlan() {
         }
     }
 
-    console.log("Plan:", plan);
-
     function updatePlanState(data) {
         setPlan(data);
     }
@@ -158,7 +156,7 @@ function TravelPlan() {
         setMarkers(newMarkers);
     }, [activities]);
 
-    // DAY CREATION & EDITION FUNCTIONS
+    // DAY CRUD FUNCTIONS
     async function addDay(data) {
         try {
             const response = await ky.post('http://localhost:3000/api' + '/day', {
@@ -211,7 +209,7 @@ function TravelPlan() {
         }
     }
 
-    // ACTIVITY CREATION & EDITION FUNCTIONS
+    // ACTIVITY CRUD FUNCTIONS
     async function updateActivity(id, data) {
         try {
             const response = await ky.put('http://localhost:3000/api' + '/activity/' + id, {
@@ -228,15 +226,14 @@ function TravelPlan() {
 
     function handleArchive(id) {
         const activity = activities.find((card) => card._id === id);
-        activity.isArchived ? activity.isArchived = false : activity.isArchived = true;
+        activity.isArchived = !activity.isArchived;
 
-        updateActivity(id, { ...activity });
-    }
-
-    function handleUpdateOrder(id, newOrder, newDayId) {
-        const activity = activities.find((card) => card._id === id);
-        activity.order = newOrder;
-        activity.dayId = newDayId;
+        if (activity.isArchived) {
+            activity.order = activities.filter((card) => card.isArchived).length;
+            activity.dayId = null;
+        } else {
+            activity.order = activities.filter((card) => !card.isArchived && !card.dayId).length;
+        }
 
         updateActivity(id, { ...activity });
     }
@@ -375,18 +372,6 @@ function TravelPlan() {
     const [activeDay, setActiveDay] = useState(null);
     const [activeCard, setActiveCard] = useState(null);
 
-    async function updateOrder(id, newOrder) {
-        try {
-            const response = await ky.put('http://localhost:3000/api' + '/day/order/' + id, {
-                json: { order: newOrder },
-                credentials: 'include'
-            }).json();
-            setAppStatus({ open: true, severity: 'success', message: 'Order updated' });
-        } catch (error) {
-            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
-        }
-    }
-
     function handleDragStart(event) {
         if (event.active.data.current?.type === "activity") {
             setActiveCard(event.active.data.current?.day);
@@ -399,6 +384,20 @@ function TravelPlan() {
         }
     }
 
+    async function updateOrder(id, newOrder) {
+        try {
+            const response = await ky.put('http://localhost:3000/api' + '/day/order/' + id, {
+                json: { order: newOrder },
+                credentials: 'include'
+            }).json();
+            setAppStatus({ open: true, severity: 'success', message: 'Order updated' });
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
+
+    console.log("Activities:", activities);
+
     function handleDragEnd(event) {
         const { active, over } = event;
 
@@ -406,67 +405,101 @@ function TravelPlan() {
         console.log("Active:", active);
         console.log("Over:", over);
 
+        // If there is no over, or the active card is dropped on itself, abort
         if (!over || active.id === over.id) {
             return;
         }
 
+        // IF THE ACTIVE CARD IS AN ACTIVITY
         if (active.data.current.type === 'activity') {
 
             setActivities((card) => {
                 const activeIndex = card.findIndex((c) => c._id === active.id);
                 const overIndex = card.findIndex((c) => c._id === over.id);
 
+                // Activity is dropped on a day without another activity over it
+                if (over.data.current?.type === "day") {
+                    card[activeIndex].dayId = over.id;
+                    card[activeIndex].isArchived = false;
+                    card[activeIndex].order = card.filter((c) => c.dayId === over._id).length;
+
+                    updateActivity(active.id, card[activeIndex]);
+
+                    return card;
+                }
+
+                // Move inside same container
+                if (
+                    (card[activeIndex].dayId === card[overIndex].dayId) ||
+                    (card[activeIndex].isArchived && card[overIndex].isArchived) ||
+                    (!card[activeIndex].dayId && !card[overIndex].dayId)
+                ) {
+                    [card[activeIndex].order, card[overIndex].order] = [card[overIndex].order, card[activeIndex].order];
+
+                    updateActivity(active.id, card[activeIndex]);
+                    updateActivity(over.id, card[overIndex]);
+
+                    return card;
+                }
 
                 // Move in/out of archive
-                if (over.data.current.type === "activity" && (card[activeIndex].isArchived != card[overIndex].isArchived)) {
+                if (card[activeIndex].isArchived != card[overIndex].isArchived) {
                     card[activeIndex].isArchived = !card[activeIndex].isArchived;
+
+                    // Move into archive
+                    if (card[activeIndex].isArchived) {
+                        card[activeIndex].order = card.filter((c) => c.isArchived).length + 1;
+                        card[activeIndex].dayId = null;
+
+                        // Move out of archive, into day
+                    } else if (!card[activeIndex].isArchived && card[overIndex].dayId) {
+                        card[activeIndex].dayId = card[overIndex].dayId;
+                        card[activeIndex].order = card[overIndex].order;
+                        card[overIndex].order = card[overIndex].order + 1;
+
+                        // Move out of archive, into bucket list
+                    } else {
+                        card[activeIndex].order = card.filter((c) => !c.isArchived && !c.dayId).length;
+                    }
+
+                    updateActivity(active.id, card[activeIndex]);
+                    updateActivity(over.id, card[overIndex]);
+
+                    return card;
                 }
 
-                // Move in/out of day
-                if (over.data.current.type === "activity" && (card[overIndex].dayId)) {
+                // Move into/inside day
+                if (card[overIndex].dayId) {
                     card[activeIndex].dayId = card[overIndex].dayId;
-                } else {
-                    card[activeIndex].dayId = null;
-                }
-
-                // Case where activity is dropped on a day without another activiy over it
-                if (over.data.current?.type === "day") {
-                    card[activeIndex].dayId = over._id;
                     card[activeIndex].isArchived = false;
+                    card[activeIndex].order = card[overIndex].order;
+                    card[overIndex].order = card[overIndex].order + 1;
+
+                    updateActivity(active.id, card[activeIndex]);
+                    updateActivity(over.id, card[overIndex]);
+
+                    return card;
                 }
 
-                return arrayMove(card, activeIndex, overIndex);
+                // Move out of day
+                if (!card[overIndex].dayId) {
+                    card[activeIndex].dayId = null;
+                    card[activeIndex].isArchived = false;
+                    card[activeIndex].order = card.filter((c) => !c.isArchived && !c.dayId).length;
+
+                    updateActivity(active.id, card[activeIndex]);
+
+                    return card;
+                }
+                        
+
+                return card;
             });
-
-            // setActivities((card) => {
-            //     const activeCard = card.find((c) => c._id === active.id);
-            //     const overCard = card.find((c) => c._id === over.id);
-
-            //     // Move in/out of archive
-            //     if (over.data.current.type === "activity" && (activeCard.isArchived != overCard.isArchived)) {
-            //         activeCard.isArchived = !activeCard.isArchived;
-            //         updateActivity(activeCard._id, { ...activeCard });
-            //     }
-
-            //     // Move in/out of day
-            //     if (over.data.current.type === "activity" && overCard.dayId && overCard.dayId !== "") {
-            //         activeCard.dayId = overCard.dayId;
-            //         updateActivity(activeCard._id, { ...activeCard });
-            //     }
-
-            //     // Case where activity is dropped on a day without another activiy over it
-            //     if (over.data.current?.type === "day") {
-            //         activeCard.dayId = over.id;
-            //         activeCard.isArchived = false;
-            //         updateActivity(activeCard._id, { ...activeCard });
-            //     }
-
-            //     return arrayMove(card, card.indexOf(activeCard), card.indexOf(overCard));
-            // });
 
             setActiveCard(null);
         }
 
+        // IF THE ACTIVE CARD IS A DAY
         if (active.data.current.type === 'day') {
             if (over.data.current.type === "activity") {
                 return;
@@ -499,6 +532,7 @@ function TravelPlan() {
     }
 
 
+    // FORBIDDEN ACCESS IF NOT LOGGED IN
     if (!user.isLoggedIn) {
         return (
             <Box
@@ -510,6 +544,7 @@ function TravelPlan() {
         );
     }
 
+    // LOADING PAGE WHILE FETCHING DATA
     if (isPlanLoading) {
         return (
             <Box
@@ -583,6 +618,13 @@ function TravelPlan() {
                                         Bucket list
                                     </Typography>
                                 </Box>
+                                {activities.length === 0 &&
+                                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                        <Typography variant="normal" color="grey" textAlign="center">
+                                            No activities yet
+                                        </Typography>
+                                    </Box>
+                                }
                                 <Tooltip title="Add new activity" placement='left' arrow>
                                     <IconButton onClick={handleCreationStart}>
                                         <AddCircleIcon sx={{ color: "black", fontSize: "2rem" }} />
@@ -682,6 +724,7 @@ function TravelPlan() {
                                                     }>
                                                         {activities
                                                             .filter((card) => !card.isArchived && card.dayId === day._id)
+                                                            .sort((a, b) => a.order - b.order)
                                                             .map((card, cardIndex) => (
                                                                 <ActivityCard
                                                                     key={cardIndex}
@@ -712,7 +755,7 @@ function TravelPlan() {
                     {/* ARCHIVES */}
                     <Container component="section" maxWidth="lg" sx={{ my: 2, px: 2 }} id='archives'>
                         <Box
-                            p={3}
+                            p={3} minHeight={300}
                             sx={{ backgroundColor: theme.palette.primary.light, borderRadius: '10px' }}
                         >
                             {/* HEADER */}
@@ -752,6 +795,7 @@ function TravelPlan() {
                             </SortableContext>
                         </Box>
                     </Container>
+
 
                     {/* DRAG OVERLAY */}
                     <DragOverlay>

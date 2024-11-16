@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Box, Button, Container, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Pagination, Typography, useTheme } from "@mui/material";
+import AuthContext from "../components/auth/AuthContext";
 
 function PlansList() {
     const theme = useTheme();
+    const { user } = useContext(AuthContext);
 
     const [plans, setPlans] = useState([
         {
@@ -53,6 +55,19 @@ function PlansList() {
     const paginationCount = Math.ceil(plans.length / plansPerPage);
     const paginatedPlans = plans.slice((page - 1) * plansPerPage, page * plansPerPage);
 
+    if (!user.isLoggedIn) {
+        return (
+            <Box component="main" sx={{
+                minHeight: "90vh",
+                mt: 4, px: 2,
+                display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", gap: 2
+            }}>
+                <Typography variant="h1">Please log in to view your travel plans</Typography>
+                <Button variant="blackOverGrey" color="primary" href="/login">Log in</Button>
+            </Box>
+        );
+    }
+
     return (
         <Box component="main" mb={10} sx={{ minHeight: "90vh" }}>
             <Container component="section" maxWidth="lg" sx={{ mb: 6, px: 2 }}>
@@ -88,13 +103,13 @@ function PlansList() {
                             </React.Fragment>
                         ))}
                     </List>
-                    <Pagination 
-                    shape="rounded" 
-                    count={paginationCount} 
-                    page={page}
-                    onChange={handlePageChange}
-                    color="primary" 
-                    sx={{ alignSelf: "flex-end" }} />
+                    <Pagination
+                        shape="rounded"
+                        count={paginationCount}
+                        page={page}
+                        onChange={handlePageChange}
+                        color="primary"
+                        sx={{ alignSelf: "flex-end" }} />
                 </Box>
             </Container>
         </Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Button, CardMedia, Container, IconButton, Typography } from '@mui/material'
 import { useTheme } from "@mui/material";
 import Grid from '@mui/material/Grid2';
@@ -12,9 +12,11 @@ import ExploreIcon from '@mui/icons-material/Explore';
 import SubImageOrganize from '../assets/images/pexels-brunogobofoto-3854816.jpg';
 import SubImagePlan from '../assets/images/pexels-leeloothefirst-5386754.jpg';
 import SubImageExplore from '../assets/images/pexels-mike-468229-1181809.jpg';
+import AuthContext from "../components/auth/AuthContext";
 
 function Homepage() {
     const theme = useTheme();
+    const { user } = useContext(AuthContext);
 
     const headerSubsections = [
         {
@@ -101,12 +103,16 @@ function Homepage() {
                 >
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 5, px: 10 }}>
                         <Typography variant='h1' textAlign="center" color="white">Our job? Simplify your travel planning</Typography>
+                        
                         <Typography variant="normal" textAlign="center" color={theme.palette.primary.light} sx={{ display: { xs: 'none', sm: 'block' } }}>
                             Lorem ipsum dolor sit amet consectetur. Auctor urna vitae sed sed convallis mauris imperdiet.
                             Sit ipsum orci diam consectetur mattis habitasse odio id magna. Donec ut et semper et aliquam.
                             Leo nisl tellus phasellus faucibus malesuada amet.
                         </Typography>
-                        <Button variant='darkOverYellow' href='/signup' sx={{ mt: 2 }}>Get started</Button>
+
+                        {!user.isLoggedIn &&
+                            <Button variant='darkOverYellow' href='/signup' sx={{ mt: 2 }}>Get started</Button>
+                        }
                     </Box>
                 </Box>
             </Container >

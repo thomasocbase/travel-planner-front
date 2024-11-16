@@ -146,7 +146,7 @@ export default function DayCard(props) {
 
                 <AccordionDetails sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 2, backgroundColor: theme.palette.primary.light, borderRadius: "0 0 10px 10px" }}>
 
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} minHeight={300}>
 
                         {/* ACTIVITY CARDS */}
                         <Grid item size={{ sm: 12, md: 8 }}>
