@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Container, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
+import { Box, Button, Container, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
 import ky from "ky";
 
 export default function AdminUsers() {
@@ -13,7 +13,7 @@ export default function AdminUsers() {
 
     async function fetchUsers() {
         try {
-            const response = await ky.get('http://localhost:3000/api' + '/admin/users', {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/admin/users', {
                 credentials: 'include'
             }).json();
 
@@ -28,7 +28,7 @@ export default function AdminUsers() {
         <>
             <Typography variant='h1' align="center">Admin Users</Typography>
 
-            <Container maxWidth='md' sx={{ minHeight: "80vh" }}>
+            <Container maxWidth='lg' sx={{ minHeight: "80vh" }}>
                 <TableContainer>
                     <Table aria-label="Users table">
                         <TableHead>
@@ -52,21 +52,22 @@ export default function AdminUsers() {
                                     <TableCell align="right">{row.username}</TableCell>
                                     <TableCell align="right">{row.email}</TableCell>
                                     <TableCell align="right">
-                                        <Button variant="darkOverYellow">Edit</Button>
-                                        <Button variant="contained" sx={{
-                                            ml: 1,
-                                            color: "white",
-                                            border: "2px solid #CC1414",
-                                            backgroundColor: "#CC1414",
-                                            '&:hover': {
-                                                backgroundColor: 'transparent',
-                                                color: 'black',
+                                        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }} >
+                                            <Button variant="blackOverGrey">Edit</Button>
+                                            <Button variant="contained" sx={{
+                                                color: "white",
                                                 border: "2px solid #CC1414",
-                                            },
-                                        }}
-                                        >
-                                            Delete
-                                        </Button>
+                                                backgroundColor: "#CC1414",
+                                                '&:hover': {
+                                                    backgroundColor: 'transparent',
+                                                    color: 'black',
+                                                    border: "2px solid #CC1414",
+                                                },
+                                            }}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </Box>
                                     </TableCell>
                                 </TableRow>
                             ))}

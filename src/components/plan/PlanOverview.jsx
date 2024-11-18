@@ -87,7 +87,7 @@ export default function PlanOverview(props) {
 
     async function updatePlan(data) {
         try {
-            const response = await ky.put('http://localhost:3000/api' + '/plan/' + props.plan._id, {
+            const response = await ky.put(import.meta.env.VITE_API_URI + '/plan/' + props.plan._id, {
                 json: { ...data },
                 credentials: 'include'
             }).json();

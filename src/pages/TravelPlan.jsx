@@ -51,7 +51,7 @@ function TravelPlan() {
 
     async function fetchPlan() {
         try {
-            const response = await ky.get('http://localhost:3000' + '/api/plan/' + planId, {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/api/plan/' + planId, {
                 credentials: 'include'
             }).json();
 
@@ -71,7 +71,7 @@ function TravelPlan() {
 
     async function fetchActivities() {
         try {
-            const response = await ky.get('http://localhost:3000/api' + '/plan/' + planId + "/activities", {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/plan/' + planId + "/activities", {
                 credentials: 'include'
             }).json();
 
@@ -90,7 +90,7 @@ function TravelPlan() {
 
     async function fetchDays() {
         try {
-            const response = await ky.get('http://localhost:3000/api' + '/plan/' + planId + "/days", {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/plan/' + planId + "/days", {
                 credentials: 'include'
             }).json();
 
@@ -109,7 +109,7 @@ function TravelPlan() {
 
     async function fetchCategories() {
         try {
-            const response = await ky.get('http://localhost:3000/api' + '/activityType', {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/activityType', {
                 credentials: 'include'
             }).json();
 
@@ -158,7 +158,7 @@ function TravelPlan() {
     // DAY CRUD FUNCTIONS
     async function addDay(data) {
         try {
-            const response = await ky.post('http://localhost:3000/api' + '/day', {
+            const response = await ky.post(import.meta.env.VITE_API_URI + '/day', {
                 json: {
                     planId: planId,
                     userId: userId,
@@ -198,7 +198,7 @@ function TravelPlan() {
 
     async function deleteDay(id) {
         try {
-            const response = await ky.delete('http://localhost:3000/api' + '/day/' + id, {
+            const response = await ky.delete(import.meta.env.VITE_API_URI + '/day/' + id, {
                 credentials: 'include'
             }).json();
             setAppStatus({ open: true, severity: 'success', message: 'Day deleted' });
@@ -211,7 +211,7 @@ function TravelPlan() {
     // ACTIVITY CRUD FUNCTIONS
     async function updateActivity(id, data) {
         try {
-            const response = await ky.put('http://localhost:3000/api' + '/activity/' + id, {
+            const response = await ky.put(import.meta.env.VITE_API_URI + '/activity/' + id, {
                 json: { ...data },
                 credentials: 'include'
             }).json();
@@ -265,7 +265,7 @@ function TravelPlan() {
 
     async function addActivity(data) {
         try {
-            const response = await ky.post('http://localhost:3000/api' + '/activity', {
+            const response = await ky.post(import.meta.env.VITE_API_URI + '/activity', {
                 json: { ...data },
                 credentials: 'include'
             }).json();
@@ -340,7 +340,7 @@ function TravelPlan() {
 
     async function handleDelete(id) {
         try {
-            const response = await ky.delete('http://localhost:3000/api' + '/activity/' + id, {
+            const response = await ky.delete(import.meta.env.VITE_API_URI + '/activity/' + id, {
                 credentials: 'include'
             }).json();
             setAppStatus({ open: true, severity: 'success', message: 'Activity deleted' });
@@ -385,7 +385,7 @@ function TravelPlan() {
 
     async function updateOrder(id, newOrder) {
         try {
-            const response = await ky.put('http://localhost:3000/api' + '/day/order/' + id, {
+            const response = await ky.put(import.meta.env.VITE_API_URI + '/day/order/' + id, {
                 json: { order: newOrder },
                 credentials: 'include'
             }).json();
