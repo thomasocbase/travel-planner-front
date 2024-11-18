@@ -19,6 +19,8 @@ export default function DayCard(props) {
     const theme = useTheme();
     const { setAppStatus } = useContext(StatusContext);
 
+    console.log("activities", props.activities);
+
     // DnD
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
         id: props.day._id,

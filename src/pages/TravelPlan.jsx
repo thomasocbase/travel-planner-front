@@ -147,8 +147,7 @@ function TravelPlan() {
     useEffect(() => {
         const newMarkers =
             activities
-                .filter((activity) => !activity.isArchived)
-                .filter((activity) => activity.location)
+                .filter((activity) => !activity.isArchived && activity.location)
                 .map((activity) => {
                     const [lat, lng] = activity.location.split(',').map(coord => parseFloat(coord));
                     return { position: [lat, lng], popup: activity.title };
@@ -168,7 +167,7 @@ function TravelPlan() {
                     duration: "8h",
                     budget: "50",
                 },
-                credentials: 'include'
+                credentials: 'include',
             }).json();
 
             setDays([...days, response.day]);
@@ -182,7 +181,7 @@ function TravelPlan() {
         try {
             const response = await ky.put("http://localhost:3000/api" + "/day/title/" + id, {
                 json: { title: newTitle },
-                credentials: "include"
+                credentials: "include",
             }).json();
 
             setDays(days.map((day) => {
@@ -395,8 +394,6 @@ function TravelPlan() {
             setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
         }
     }
-
-    console.log("Activities:", activities);
 
     function handleDragEnd(event) {
         const { active, over } = event;

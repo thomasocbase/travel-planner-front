@@ -86,10 +86,10 @@ export default function PlanOverview(props) {
     }
 
     async function updatePlan(data) {
-        // TODO: TEST ENDPOINT
         try {
             const response = await ky.put('http://localhost:3000/api' + '/plan/' + props.plan._id, {
-                json: { ...data }
+                json: { ...data },
+                credentials: 'include'
             }).json();
 
             setAppStatus({ open: true, severity: 'success', message: 'Plan updated' });
