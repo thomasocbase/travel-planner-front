@@ -27,8 +27,23 @@ export default function PlanOverview(props) {
     const [error, setError] = useState(null);
     const [file, setFile] = useState(null);
     const [fileError, setFileError] = useState(null);
+    const [visibilityStates, setVisibilityStates] = useState([]);
 
     const { appStatus, setAppStatus } = useContext(StatusContext);
+
+    useEffect(() => {
+        fetchVisibilityStates();
+    }, []);
+
+    async function fetchVisibilityStates() {
+        try {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/planVisibilityState').json();
+            setVisibilityStates(response);
+            console.log("Visibility states", response);
+        } catch (error) {
+            setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
+        }
+    }
 
     function handleEditTitleStart() {
         setIsEditingTitle(true);
@@ -52,7 +67,6 @@ export default function PlanOverview(props) {
             ...props.plan,
             title: editingValue
         });
-        // TODO: Send new title to backend
     }
 
     function handleEnterPress(e) {
@@ -62,8 +76,8 @@ export default function PlanOverview(props) {
     }
 
     function handleEditStatusStart() {
+        setEditingValue(props.plan.planVisibilityState.label);
         setIsOpenStatusDialog(true);
-        setEditingValue(props.plan.planVisibilityState);
     }
 
     function handleEditDescStart() {
@@ -99,11 +113,13 @@ export default function PlanOverview(props) {
     }
 
     function handleStatusDialogConfirm() {
-        updatePlan({ ...props.plan, planVisibilityState: editingValue });
+        const visibilityState = visibilityStates.find(state => state.label === editingValue);
+
+        updatePlan({ ...props.plan, planVisibilityState: visibilityState });
         setIsOpenStatusDialog(false);
         props.updatePlanState({
             ...props.plan,
-            planVisibilityState: editingValue
+            planVisibilityState: visibilityState
         });
     }
 
@@ -124,6 +140,8 @@ export default function PlanOverview(props) {
         setFileError(null);
         setFile(null);
     }
+
+    console.log("Editing value", editingValue);
 
     return (
         <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
@@ -163,12 +181,11 @@ export default function PlanOverview(props) {
 
                     {/* STATUS */}
                     <Box display="flex" alignItems="center" gap={0.5}>
-                        <Typography color='grey'>{props.plan.planVisibilityState}</Typography>
+                        <Typography color='grey' textTransform="capitalize">{props.plan.planVisibilityState.label}</Typography>
                         <IconButton onClick={handleEditStatusStart}>
-
-                            {props.plan.visibilityState === "private" && <VisibilityOffIcon />}
-                            {props.plan.visibilityState === "unlisted" && <LockPersonIcon />}
-                            {props.plan.visibilityState === "public" && <PublicIcon />}
+                            {props.plan.planVisibilityState?.label === "private" && <VisibilityOffIcon />}
+                            {props.plan.planVisibilityState?.label === "unlisted" && <LockPersonIcon />}
+                            {props.plan.planVisibilityState?.label === "public" && <PublicIcon />}
                         </IconButton>
                     </Box>
                 </Box>
@@ -308,15 +325,28 @@ export default function PlanOverview(props) {
                 <FormControl>
                     <RadioGroup
                         aria-labelledby="radio-buttons-status-label"
-                        defaultValue={editingValue}
+                        value={editingValue}
+                        // defaultValue={editingValue}
                         name="radio-buttons-status-group"
                         onChange={(e) => setEditingValue(e.target.value)}
                     >
-                        <FormControlLabel value="67292c7e3e797b9c6565b1b2" control={<Radio />} label="Private" />
+                        <FormControlLabel
+                            value={visibilityStates[2]?.label}
+                            control={<Radio />}
+                            label="Private"
+                        />
                         <Typography variant="notice" sx={{ mb: 2 }} >Only you can see this plan</Typography>
-                        <FormControlLabel value="67292c7e3e797b9c6565b1ae" control={<Radio />} label="Unlisted" />
+                        <FormControlLabel
+                            value={visibilityStates[1]?.label}
+                            control={<Radio />}
+                            label="Unlisted"
+                        />
                         <Typography variant="notice" sx={{ mb: 2 }}>This plan is accessible by anyone via direct link</Typography>
-                        <FormControlLabel value="67292c7e3e797b9c6565b1ab" control={<Radio />} label="Public" />
+                        <FormControlLabel
+                            value={visibilityStates[0]?.label}
+                            control={<Radio />}
+                            label="Public"
+                        />
                         <Typography variant="notice" sx={{ mb: 2 }}>This plan is listed in the public directory (pending moderation)</Typography>
                     </RadioGroup>
                 </FormControl>

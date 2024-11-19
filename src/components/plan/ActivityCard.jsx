@@ -73,7 +73,7 @@ export default function ActivityCard(props) {
     return (
         <Card
             ref={setNodeRef}
-            elevation={0}
+            elevation={1}
             sx={{
                 backgroundColor: "white",
                 borderRadius: '10px',

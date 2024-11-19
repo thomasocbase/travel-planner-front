@@ -45,13 +45,14 @@ function TravelPlan() {
     const [plan, setPlan] = useState({});
     const [isPlanLoading, setIsPlanLoading] = useState(true);
 
+
     useEffect(() => {
         fetchPlan();
     }, []);
 
     async function fetchPlan() {
         try {
-            const response = await ky.get(import.meta.env.VITE_API_URI + '/api/plan/' + planId, {
+            const response = await ky.get(import.meta.env.VITE_API_URI + '/plan/' + planId, {
                 credentials: 'include'
             }).json();
 
