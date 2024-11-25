@@ -1,6 +1,6 @@
 import { Box, useTheme } from '@mui/material'
 import React, { useEffect } from 'react'
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet'
+import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { Icon } from 'leaflet'
 import pin_icon_black from '../../assets/markers/pin_icon_black.png'
 
@@ -17,30 +17,31 @@ export default function PlanMap(props) {
     const [zoom, setZoom] = React.useState(10)
 
     useEffect(() => {
-
-        // Calculating center of map based on average of all markers
-        const total = props.markers.reduce((acc, marker) => {
-            return [acc[0] + marker.position[0], acc[1] + marker.position[1]];
-        }, [0, 0]);
-
-        const tempCenter = [total[0] / props.markers.length, total[1] / props.markers.length];
-        setCenter(tempCenter)
-        console.log("Center", center)
-
-        // Adapting zoom level based on distance between markers
-        const difference = props.markers.reduce((acc, marker) => {
-            const distance = Math.sqrt((marker.position[0] - center[0]) ** 2 + (marker.position[1] - center[1]) ** 2);
+        if (!props.markers || props.markers.length === 0) return;
+    
+        // Calculate new center
+        const total = props.markers.reduce(
+            (acc, marker) => [acc[0] + marker.position[0], acc[1] + marker.position[1]],
+            [0, 0]
+        );
+    
+        const newCenter = [total[0] / props.markers.length, total[1] / props.markers.length];
+    
+        // Calculate max distance based on new center
+        const maxDistance = props.markers.reduce((acc, marker) => {
+            const distance = Math.sqrt(
+                (marker.position[0] - newCenter[0]) ** 2 +
+                (marker.position[1] - newCenter[1]) ** 2
+            );
             return Math.max(acc, distance);
         }, 0);
-
-        // Zoom level is inversely proportional to distance
-        const tempZoom = Math.round(14 - Math.log2(difference / 0.01));
-        setZoom(tempZoom)
-        console.log("Zoom", zoom)
-
-        console.log("Markers", props.markers)
-
-    }, [props.markers])
+    
+        // Calculate new zoom level
+        const newZoom = Math.max(1, Math.min(18, Math.round(14 - Math.log2(maxDistance / 0.01))));
+    
+        setCenter(newCenter);
+        setZoom(newZoom);
+    }, [props.markers]);
 
     return (
         <Box
@@ -52,14 +53,22 @@ export default function PlanMap(props) {
             }}
         >
             <MapContainer center={center} zoom={zoom} scrollWheelZoom={false}>
-                <Map markers={props.markers} attribution={props.attribution} />
+                <Map markers={props.markers} attribution={props.attribution} center={center} zoom={zoom} />
             </MapContainer>
         </Box>
     )
 }
 
 function Map(props) {
-    const map = useMapEvents({
+    const map = useMap();
+
+    useEffect(() => {
+        if (props.markers.length > 0) {
+            map.setView(props.center, props.zoom); // Met à jour le centre et le zoom
+        }
+    }, [props.center, props.zoom, map]);
+
+    useMapEvents({
         focus: () => {
             map.scrollWheelZoom.enable()
             map.dragging.enable()
