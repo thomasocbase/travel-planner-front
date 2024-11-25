@@ -29,7 +29,7 @@ export default function PlanOverview(props) {
     const [fileError, setFileError] = useState(null);
     const [visibilityStates, setVisibilityStates] = useState([]);
 
-    const { appStatus, setAppStatus } = useContext(StatusContext);
+    const { setAppStatus } = useContext(StatusContext);
 
     useEffect(() => {
         fetchVisibilityStates();
@@ -39,7 +39,6 @@ export default function PlanOverview(props) {
         try {
             const response = await ky.get(import.meta.env.VITE_API_URI + '/planVisibilityState').json();
             setVisibilityStates(response);
-            console.log("Visibility states", response);
         } catch (error) {
             setAppStatus({ open: true, severity: 'error', message: 'Something went wrong. ' + error.message });
         }
@@ -141,11 +140,9 @@ export default function PlanOverview(props) {
         setFile(null);
     }
 
-    console.log("Editing value", editingValue);
-
     return (
         <Grid container component="header" id="description-section" columnSpacing={4} rowSpacing={2}>
-            <Grid item size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={3}>
+            <Grid size={{ xs: 12, md: 6 }} display="flex" flexDirection="column" gap={3}>
                 <Box display="flex" justifyContent="space-between" flexWrap={"wrap"}>
                     <Box display="flex" gap={1}>
 
@@ -280,7 +277,7 @@ export default function PlanOverview(props) {
             </Grid>
 
             {/* FEATURED IMAGE */}
-            <Grid item size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, md: 6 }}>
                 {props.plan.image ? (
                     <Box component="figure" sx={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", borderRadius: "10px" }}>
                         <Box component="img" src={props.plan.image} alt="Travel Plan" width="100%" />

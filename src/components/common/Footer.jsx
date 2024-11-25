@@ -73,11 +73,11 @@ function Footer() {
         >
             <Container>
                 <Grid container columnSpacing={10} rowSpacing={5} justifyContent="space-between">
-                    <Grid item>
+                    <Grid>
                         <Typography variant="h2" color="white">LOGO</Typography>
                     </Grid>
                     {footerLinks.map((section, index) => (
-                        <Grid item key={index} display="flex" flexDirection="column">
+                        <Grid key={index} display="flex" flexDirection="column">
                             <Typography variant="h4" sx={{ color: theme.palette.primary.medium, mb: 1 }}>
                                 {section.title}
                             </Typography>

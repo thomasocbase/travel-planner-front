@@ -640,7 +640,7 @@ function TravelPlan() {
                                         .filter((card) => !card.isArchived && !card.dayId)
                                         .sort((a, b) => a.order - b.order)
                                         .map((card, index) => (
-                                            <Grid item key={index} size={{ sm: 12, md: 6 }}>
+                                            <Grid key={index} size={{ sm: 12, md: 6 }}>
                                                 <ActivityCard
                                                     data={card}
                                                     edit={() => handleEditStart(card._id)}
@@ -776,7 +776,7 @@ function TravelPlan() {
                                         .filter((card) => card.isArchived)
                                         .sort((a, b) => a.order - b.order)
                                         .map((card, index) => (
-                                            <Grid item key={index} size={{ sm: 12, md: 6 }}>
+                                            <Grid key={index} size={{ sm: 12, md: 6 }}>
                                                 <ActivityCard
                                                     data={card}
                                                     edit={() => handleEditStart(card._id)}

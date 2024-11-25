@@ -19,8 +19,6 @@ export default function DayCard(props) {
     const theme = useTheme();
     const { setAppStatus } = useContext(StatusContext);
 
-    console.log("activities", props.activities);
-
     // DnD
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
         id: props.day._id,
@@ -151,7 +149,7 @@ export default function DayCard(props) {
                     <Grid container spacing={2} minHeight={300}>
 
                         {/* ACTIVITY CARDS */}
-                        <Grid item size={{ sm: 12, md: 8 }}>
+                        <Grid size={{ sm: 12, md: 8 }}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                                 {props.children}
                                 <Box width="100%" height={50} sx={{ border: "2px dotted grey", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -161,7 +159,7 @@ export default function DayCard(props) {
                         </Grid>
 
                         {/* SIDEBAR */}
-                        <Grid item size={{ xs: 12, sm: 12, md: 4 }} component="aside" mb={2}>
+                        <Grid size={{ xs: 12, sm: 12, md: 4 }} component="aside" mb={2}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 
                                 {markers && markers.length > 0 &&
