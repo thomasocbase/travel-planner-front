@@ -26,7 +26,7 @@ export default function AdminUsers() {
 
     return (
         <>
-            <Typography variant='h1' align="center">Admin Users</Typography>
+            <Typography variant='h1' align="center" mb={5}>Admin board - Users</Typography>
 
             <Container maxWidth='lg' sx={{ minHeight: "80vh" }}>
                 <TableContainer>

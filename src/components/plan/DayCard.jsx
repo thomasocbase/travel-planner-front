@@ -37,6 +37,8 @@ export default function DayCard(props) {
     // MAP MARKERS
     const [markers, setMarkers] = useState([]);
 
+    console.log("activities", props.activities);
+
     useEffect(() => {
         const newMarkers = props.activities?.map(activity => {
             const [lat, lng] = activity.location.split(',').map(coord => parseFloat(coord));

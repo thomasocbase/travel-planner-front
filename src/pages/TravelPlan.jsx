@@ -711,7 +711,7 @@ function TravelPlan() {
                                                     expanded={!collapsedAccordions.includes(dayIndex)}
                                                     onChange={() => updateAccordions(dayIndex)}
                                                     activities={activities
-                                                        .filter((card) => card.dayId === day._id)
+                                                        .filter((card) => !card.isArchived && card.dayId === day._id)
                                                         .sort((a, b) => a.order - b.order)}
                                                     updateTitle={updateTitle}
                                                     deleteDay={() => deleteDay(day._id)}
